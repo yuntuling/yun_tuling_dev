@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>RequireMent</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="../css/iconfont.css">
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/mui.extension.css" />
+		<style type="text/css">
+			.mui-table-view-cell {
+				padding: 8px 15px;
+			}
+			
+			p {
+				font-size: 17px;
+			}
+		</style>
+
+		<script src='../js/jquery-1.9.1.min.js'></script>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/config.js"></script>
+		<script type="application/javascript">
+			
+			var Templete = '';
+		</script>
+		<script type="text/javascript">
+			var params;
+			var param0;
+			var EntityName = "";
+			var Data = [];
+			var Privilege = '';
+			var Filter = {};
+			var Order = '';
+			var EntityField = [];
+			var EntityOption = {};
+			var pagesize = 20;
+			var lastid;
+			var lastvalue;
+			var timeoutObj;
+			var searchFilter = null;
+			var debugFlag="?debug=1";
+
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						callback: GetFirstPageData
+					},
+					up: {
+						contentrefresh: '正在加载...',
+						callback: GetNextPageData
+					}
+				},
+				gestureConfig: {
+					tap: true, //默认为true
+					doubletap: true, //默认为false
+					longtap: true, //默认为false
+					swipe: true, //默认为true
+					drag: true, //默认为true
+					hold: true, //默认为false，不监听
+					release: false //默认为false，不监听
+				}
+			});
+
+			mui.plusReady(function() {
+				document.addEventListener('touchstart',function(){
+					mui.fire(plus.webview.currentWebview().parent(), 'SubViewTouchStart');
+				},false)
+				params = plus.webview.currentWebview().views;
+				//获取并删除第一个参数
+				param0 = params.shift();
+				if(!!param0.pagesize){
+					try{
+						pagesize=Number(param0.pagesize);
+					}catch(e){
+						
+					}
+					
+				}
+				EntityName = param0.e;
+
+				if(params.length > 0) {
+					if(param0.d == undefined) {
+						params[0].d = [{ id: "", name: "" }];
+					} else {
+						params[0].d = param0.d;
+					}
+					params[0].d.push({ id: "", name: "" });
+				}
+
+				//搜索或切换视图事件
+				window.addEventListener('SearchRecord', function(event) {
+					param0.v = event.detail.viewname;
+					searchFilter = null;
+					var s = event.detail.search.replace(/(^\s*)|(\s*$)/g, "");
+					if(s != "") {
+						var dateReg = /^[0-9]{4}(-?|\/?)(((0[13578]|(10|12))(-?|\/?)(0[1-9]|[1-2][0-9]|3[0-1]))|(02(-?|\/?)(0[1-9]|[1-2][0-9]))|((0[469]|11)(-?|\/?)(0[1-9]|[1-2][0-9]|30)))$/;
+						var isDate = dateReg.test(s);
+						var dateBegin = "";
+						var dateEnd = "";
+						if(isDate) {
+							dateBegin = s.replace(/-/g, "").replace(/\//g, "");
+							dateBegin = dateBegin.substr(0, 4) + "/" + dateBegin.substr(4, 2) + "/" + dateBegin.substr(6, 2);
+							var tDate = new Date(dateBegin);
+							tDate.setDate(tDate.getDate() + 1);
+							dateEnd = tDate.format("yyyy/MM/dd");
+						}
+						var conditions = [];
+						for(var fname in EntityField) {
+							var fd = EntityField[fname];
+							if(fd.Cansearchable == false) continue;
+
+							if(fd.Type == 'nvarchar') {
+								conditions.push({
+									"AttributeName": fname,
+									"Operator": "Like",
+									"Values": ["*" + s]
+								});
+							} else if(fd.Type == 'lookup') {
+								conditions.push({
+									"AttributeName": fname,
+									"Operator": "Like",
+									"Values": [{ "Name": "*" + s }]
+								});
+							} else if(isDate && (fd.Type == 'date' || fd.Type == 'datetime')) {
+								conditions.push({
+									"AttributeName": fname,
+									"Operator": "Between",
+									"Values": [dateBegin, dateEnd]
+								});
+							}
+						}
+						if(conditions.length > 0) {
+							searchFilter = { "Conditions": conditions, "FilterOperator": "OR" };
+						}
+
+					}
+
+					GetMobileInitData();
+				});
+
+				//新建记录成功后刷新列表
+				window.addEventListener('PullDownAfterCreate', function(event) {
+					GetFirstPageData();
+				});
+
+				//编辑记录成功后刷新修改的记录
+				window.addEventListener('RefreshAfterUpdate', function(event) {
+					mui.fire(plus.webview.currentWebview().opener(),'RefreshAfterUpdate',event.detail);
+					if(event.detail.entityname.toLowerCase()!=EntityName.toLowerCase()){
+						return;
+					}
+					var info = event.detail.data;
+					var li = document.getElementById(event.detail.id);
+					if(!!li){
+						SetLiInnerHtml(info, li);
+					}
+					
+				});
+
+				setTimeout(GetMobileInitData, 100);
+
+			});
+
+			function View_Bind(e) {
+				var selected_id = this.getAttribute('id');
+				var selected_name = this.getAttribute('oname');
+				var selected_data = this.getAttribute('odata');
+
+				if(param0.elem != undefined) {
+					mui.fire(plus.webview.currentWebview().opener(), 'DataSelected', {
+						id: selected_id,
+						name: selected_name,
+						r: param0.r,
+						elem: param0.elem,
+						data: JSON.parse(selected_data)
+					});
+				} else {
+					var d0 = { id: selected_id, name: selected_name };
+					if(params.length > 0) {
+						params[0].d[params[0].d.length - 1] = d0;
+						if(params[0].url == "/form/form.html") { params[0].id = d0.id; }
+						TLM.OpenWindow(params);
+					} else {
+						TLM.OpenWindow([{ url: '/form/form.html', e: EntityName, id: d0.id }]);
+					}
+				}
+			}
+
+			function GetMobileInitData() {
+				//plus.nativeUI.showWaiting();
+				var postData = {};
+				postData.entityname = EntityName;
+				postData.pagesize = pagesize;
+				postData.viewname = param0.v;
+
+				if(param0.f) {
+					var f = JSON.stringify(param0.f);
+					if(param0.d) {
+						for(var i = 0; i < param0.d.length; i++) {
+							var regId = new RegExp("\{" + i.toString() + ":id\}", "ig");
+							var regName = new RegExp("\{" + i.toString() + ":name\}", "ig");
+							f = f.replace(regId, param0.d[i].id).replace(regName, param0.d[i].name);
+						}
+					}
+					Filter = JSON.parse(f);
+					if(searchFilter != null) {
+						var f2 = Filter;
+						f2.Filters.push(searchFilter);
+						postData.filter = JSON.stringify(f2);
+					} else {
+						postData.filter = f;
+					}
+				} else if(searchFilter != null) {
+					postData.filter = JSON.stringify(searchFilter);
+				}
+
+				document.getElementById("ul_context").innerHTML = "";
+				TLM.ajax({
+					url: TLM.ServiceUrl + "/service/data/GetMobileInitData.ashx"+debugFlag,
+					type: "POST",
+					dataType: "json",
+					data: postData,
+					success: function(dat) {
+
+						mui('#pullrefresh').pullRefresh().refresh(true);
+						mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+						Data = dat.Data;
+						Privilege = dat.Privilege;
+						Order = dat.Order;
+						if(!!dat.Templete&&dat.Templete.length>0){
+							Templete = dat.Templete;
+						}
+						EntityField = dat.EntityField;
+						EntityOption = dat.EntityOption;
+						mui.fire(plus.webview.currentWebview().opener(), 'SubDataInited', { v: dat.Views, p: Privilege });
+						if(!!dat.CSS && dat.CSS != "" && !document.getElementById("ostyle")) {
+							var oHead = document.getElementsByTagName('head').item(0);
+							var oStyle = document.createElement("style");
+							oStyle.type = "text/css";
+							oStyle.id = "ostyle";
+							oStyle.innerHTML = dat.CSS;
+							oHead.appendChild(oStyle);
+						}
+						if(!!dat.JS && dat.JS != "" && !document.getElementById("oscript")) {
+							var oHead = document.getElementsByTagName('head').item(0);
+							var oScript = document.createElement("script");
+							oScript.language = "javascript";
+							oScript.type = "text/javascript";
+							oScript.id = "oscript";
+							oScript.defer = true;
+							oScript.text = dat.JS;
+							oHead.appendChild(oScript);
+						}
+						if(typeof(View_Before) == "function") {
+								View_Before();
+
+							}
+
+						mui.fire(plus.webview.currentWebview().parent(), 'View_Before_Finished');
+						//绑定点击事件
+						mui('#ul_context').off();
+						mui('#ul_context').on('tap', 'li', View_Bind);
+						
+						ShowData(Data);
+						$('#loading').remove();
+						$('#ul_context').fadeIn(500);
+					}
+				});
+			}
+
+			function GetFirstPageData() {
+				mui('#pullrefresh').pullRefresh().refresh(true);
+				EntityName = param0.e;
+				var postData = {};
+				postData.entityname = EntityName;
+				postData.order = Order.col + " " + Order.type;
+				postData.pagesize = pagesize;
+				postData.viewname = param0.v;
+				if(param0.f) {
+					if(searchFilter != null) {
+						var f2 = Filter;
+						f2.Filters.push(searchFilter);
+						postData.filter = JSON.stringify(f2);
+					} else {
+						postData.filter = JSON.stringify(Filter);
+					}
+				} else if(searchFilter != null) {
+					postData.filter = JSON.stringify(searchFilter);
+				}
+				TLM.ajax({
+					//url: TLM.ServiceUrl + "/Service/CommonOperation/GetNextPageData.ashx",	
+					url: TLM.ServiceUrl + "/Service/Data/GetNextPageData.ashx",
+					type: "POST",
+					dataType: "json",
+					data: postData,
+					success: function(dat) {
+						document.getElementById("ul_context").innerHTML = "";
+						mui('#pullrefresh').pullRefresh().refresh(true);
+						mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+
+						ShowData(dat);
+
+						$('#loading').hide();
+					}
+				});
+			}
+
+			function GetNextPageData() {
+				EntityName = param0.e;
+				var postData = {};
+				postData.entityname = EntityName;
+				postData.order = Order.col + " " + Order.type;
+				if(lastid) {
+					postData.lastid = lastid;
+					if(lastvalue!=null)
+					postData.lastordervalue = lastvalue;
+				}
+				postData.pagesize = pagesize;
+				postData.viewname = param0.v;
+				if(param0.f) {
+					if(searchFilter != null) {
+						var f2 = Filter;
+						f2.Filters.push(searchFilter);
+						postData.filter = JSON.stringify(f2);
+					} else {
+						postData.filter = JSON.stringify(Filter);
+					}
+				} else if(searchFilter != null) {
+					postData.filter = JSON.stringify(searchFilter);
+				}
+				TLM.ajax({
+					//url: TLM.ServiceUrl + "/Service/CommonOperation/GetNextPageData.ashx",
+					url: TLM.ServiceUrl + "/Service/Data/GetNextPageData.ashx",
+					type: "POST",
+					dataType: "json",
+					data: postData,
+					success: function(dat) {
+						ShowData(dat);
+						//mui('#pullrefresh').pullRefresh().endPullupToRefresh();
+						
+					}
+				});
+			}
+
+			function ShowData(data) {
+				
+				if(data.length > 0) {
+					var re = /\{(.*?)\}/ig;
+					for(var i = 0; i < data.length; i++) {
+						var info = data[i];
+						var li = document.createElement("li");
+						li.className = 'mui-table-view-cell';
+						li.id = info[EntityName + "id"];
+						SetLiInnerHtml(info, li);
+						mui("#ul_context")[0].appendChild(li);
+					}
+					lastid = data[data.length - 1][EntityName + "id"];
+					lastvalue = data[data.length - 1][Order.col];
+				} else if(mui("#ul_context")[0].innerHTML == "") {
+					var nodata = document.createElement("span");
+					nodata.className = 'mui-table-view-cell';
+					nodata.style.lineHeight = '40px';
+					nodata.innerHTML = '无数据';
+					mui("#ul_context")[0].appendChild(nodata);
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh();
+				}
+
+				if(data.length < pagesize) {
+					//参数为true代表没有更多数据了。
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+				} else {
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh();
+				}
+				if(typeof(View_After) == "function") {
+					View_After();
+				}
+				mui.fire(plus.webview.currentWebview().parent(),'View_Bind_Finished');
+			}
+
+			function SetLiInnerHtml(info, li) {
+				if(info["tly_name"]) {
+					li.setAttribute("oname", info["tly_name"]);
+				} else if(info["name"]) {
+					li.setAttribute("oname", info["name"]);
+				} else if(info["tlm_name"]){
+					li.setAttribute("oname", info["tlm_name"]);
+				} else{
+					li.setAttribute("oname", "");
+				}
+				li.setAttribute("odata", JSON.stringify(info));
+				var fieldName = "";
+				var re = /\{(.*?)\}/ig;
+				var mathes = [];
+				var innerHtml = Templete;
+				while(mathes = re.exec(Templete)) {
+					fieldName = mathes[1].replace(":date", "").replace(":Id","");
+					
+					var fieldValue = info[fieldName];
+					var fieldType = EntityField[fieldName].Type;
+					var showValue = "";
+					var showlookupValue = "";
+					if(fieldValue != null) {
+						if(fieldType == "lookup") {
+							showValue = fieldValue.name;
+							showlookupValue = fieldValue.id;
+						} else if(fieldType == "picklist") {
+							for(var j = 0; j < EntityOption[fieldName].length; j++) {
+								if(EntityOption[fieldName][j].Value == fieldValue) {
+									showValue = EntityOption[fieldName][j].Text;
+									break;
+								}
+							}
+						} else {
+							showValue = fieldValue;
+						}
+					}
+
+					var reg = new RegExp("\{" + fieldName + "\}", "ig");
+					if(fieldType == "date" || fieldType == "datetime") {
+						var regDate = new RegExp("\{" + fieldName + ":date\}", "ig");
+						innerHtml = innerHtml.replace(regDate, showValue.substr(0, 10));
+					}else if(fieldType=="lookup"){
+						var regLookup = new RegExp("\{" + fieldName + ":Id\}", "ig");
+						innerHtml = innerHtml.replace(regLookup, showlookupValue);
+					}else if(fieldType=="picklist"){
+						var regPicklist = new RegExp("\{" + fieldName + ":value\}", "ig");
+						innerHtml = innerHtml.replace(regPicklist, fieldValue);
+					}
+					innerHtml = innerHtml.replace(reg, showValue);
+				}
+				li.innerHTML = innerHtml;
+			}
+			
+		</script>
+	</head>
+
+	<body>
+		<!--Loading图形-->
+		<div id="loading" class="mui-pull" style="position: absolute;top:80px;z-index: 1000;">
+			<div class="mui-pull-loading mui-icon mui-spinner"></div>
+		</div>
+		<!--下拉刷新容器-->
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<!--数据列表-->
+				<ul id="ul_context" class="mui-table-view" style="display: none;">
+				</ul>
+			</div>
+		</div>
+
+	</body>
+
+</html>

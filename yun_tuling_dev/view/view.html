@@ -1,0 +1,443 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<title>VIEW</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" src="../js/config.js"></script>
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/iconfont.css">
+		<style type="text/css">
+			.hidden {
+				display: none!important;
+				height: 0px!important;
+				overflow: hidden;
+			}
+			
+			.mui-bar {
+				position: static;
+			}
+			
+			.mui-bar-nav {
+				box-shadow: none;
+				-webkit-box-shadow: none;
+			}
+			
+			.mui-segmented-control {
+				border: none;
+			}
+			
+			.mui-segmented-control .mui-control-item {
+				line-height: 35px;
+				color: #ffffff;
+				border: none;
+				background-color: #555555;
+			}
+			
+			.mui-segmented-control .mui-control-item.mui-active {
+				color: #555555;
+				background-color: #ffffff;
+			}
+			
+			.mui-table-view-cell.mui-active {
+				background-color: #DD524D;
+			}
+			
+			#search {
+				background-color: #328ed6;
+				height: 32px;
+				padding: 0 30px 0 5px;
+				font-size: 14px;
+				color: #c0def5;
+			}
+			
+			.mui-indexed-list-search.mui-input-row.mui-search.mui-active:before {
+				left: auto;
+				right: 5px;
+			}
+			
+			.mui-placeholder {
+				margin-top: 2px;
+			}
+			
+			.mui-bar-nav~.mui-content .mui-pull-top-pocket {
+				top: 75px !important;
+			}
+			
+			#viewContainer {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				/*font:15px "宋体";*/
+				font-size: 16px;
+				text-align: center;
+			}
+			
+			#viewContainer .vli {
+				display: inline-block;
+				text-align: center;
+				padding: 8px 0px 8px 0px;
+				background: #fff;
+				border-bottom: 0.5px solid #e7e7e7;
+			}
+			
+			#viewContainer .vli .mui-control-item {
+				color: #4b4b4b;
+				border-bottom: 2px solid #FFFFFF;
+			}
+			
+			#viewContainer .vli .mui-active {
+				color: #1b82d2;
+				border-bottom: 2px solid #1b82d2;
+			}
+			
+			.mui-search .mui-placeholder .mui-icon {
+				font-size: 15px;
+				color: #c0def5;
+			}
+			
+			.mui-search .mui-placeholder {
+				text-align: left;
+				padding-left: 10px;
+				padding-top: 2px;
+			}
+			
+			.mui-search .mui-placeholder span:nth-child(2) {
+				font-size: 15px;
+				color: #c0def5;
+			}
+			
+			.mui-search:before {
+				font-size: 15px;
+				color: #c0def5;
+			}
+			
+			.vli {
+				padding-bottom: 0px!important;
+			}
+		</style>
+		<style id="hstyle">
+			.filter .mui-pull-top-pocket {
+				top: 75px !important;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+			<a id="btn_back" class="mui-icon mui-icon-back" style="position:absolute;display:none;color: #ffffff;" onclick="mui.back();"></a>
+			<div id="search_area" class="mui-indexed-list-search mui-input-row mui-search" style="margin: 0 auto;width:80%;display: none;z-index: 10000"><input id='search' type="search" class="mui-indexed-list-search-input" placeholder="输入关键词搜索"></div>
+			<a id="btn_create" class="mui-icon icon iconfont icon-jia view-btn-array" style="position:absolute;display:none;right: 10px;top:0;color: #ffffff;"></a>
+			<a id="btn_search" class="mui-icon icon iconfont icon-search_icon view-btn-array" style="position:absolute;display:none;right: 40px;top:0;color: #ffffff;"></a>
+			<h1 class="mui-title hidden" style="color: white;" id="viewTitle"></h1></header>
+		<div id="ULList">
+			<ul id="viewContainer"></ul>
+		</div>
+		<div id="PageCommonHeader">
+		</div>
+		<div id="filterMsg" style="padding: 5px 5px 5px 5px;"></div>
+		<div class="mui-content"></div>
+	</body>
+	<script type="text/javascript">
+		var views = [];
+		var searchEnable = false;
+		var FirstTimeLoad = true;
+
+		function siblings(elm) {
+			var a = [];
+			var p = elm.parentNode.children;
+			for(var i = 0, pl = p.length; i < pl; i++) {
+				if(p[i] !== elm) a.push(p[i]);
+			}
+			return a;
+		}
+
+		mui.plusReady(function() {
+				views = plus.webview.currentWebview().views;
+				if(views[0].v == undefined) {
+					views[0].v = "appdefaultview";
+				}
+				var subStyles = {
+					top: '84px',
+					bottom: '0px',
+					background: "transparent"
+				};
+				//按钮(button)，返回按钮(back)
+				if(views[0].b && views[0].b.b == 0) {
+					mui.back = function(event) {
+						if(!mui.os.ios) {
+							if(confirm('确认退出？')) {
+								plus.runtime.quit();
+							}
+						}
+						return false;
+					};
+				} else {
+					mui("#btn_back")[0].style.display = "inline-block";
+				}
+				//筛选条件显示(show)
+				if(views[0].s) {
+					if(views[0].d) {
+						for(var i = 0; i < views[0].d.length; i++) {
+							var regId = new RegExp("\{" + i.toString() + ":id\}", "ig");
+							var regName = new RegExp("\{" + i.toString() + ":name\}", "ig");
+							views[0].s.html = views[0].s.html.replace(regId, views[0].d[i].id).replace(regName, views[0].d[i].name);
+						}
+					}
+					document.body.className = 'filter';
+					subStyles.top = views[0].s.top * 1 + 85 + 'px';
+					mui("#filterMsg")[0].innerHTML = views[0].s.html;
+				}
+				var subUrl = "view_sub.html";
+				if(localStorage.appversion == "0.0.0") {
+					appurl = "view_sub.html"
+				} else {
+					appurl = views[0].e + "_" + views[0].v + "_sub.html";
+				}
+				mui.init({
+					subpages: [{
+						url: appurl,
+						id: views[0].id + "_sub",
+						extras: {
+							'views': views
+						},
+						styles: subStyles
+					}]
+				});
+			}
+
+		);
+		//绑定视图切换事件
+		mui('#viewContainer').on('tap', 'a', function(e) {
+				//加载实体对应视图的subview
+				views[0].v = this.getAttribute("href");
+				var args = {
+					'viewname': views[0].v,
+					'search': mui('#search')[0].value
+				};
+				mui.fire(plus.webview.getWebviewById(views[0].id + "_sub"), 'SearchRecord', args);
+			}
+
+		);
+		mui('header').on('tap', '#btn_search', function(e) {
+				ShowSearchLine();
+			}
+
+		);
+		$("#search").blur(function() {
+				HideWhenSearchLineNotEmpty();
+			}
+
+		);
+		//绑字搜索框事件
+		mui(".mui-search").on('change', 'input', function(e) {
+				var args = {
+					'viewname': views[0].v,
+					'search': mui('#search')[0].value
+				};
+				mui.fire(plus.webview.getWebviewById(views[0].id + "_sub"), 'SearchRecord', args);
+				HideWhenSearchLineNotEmpty();
+			}
+
+		);
+		//绑定新建按钮事件
+		mui('header').on('tap', '#btn_create', function(e) {
+				var newv = {};
+				newv.id = 'add';
+				newv.url = 'form.html';
+				newv.e = views[0].e;
+				newv.data = views[0].def;
+				newv.v = views[0].v;
+				if(views[0].d != undefined && views[0].def != undefined) {
+					var addStr = JSON.stringify(views[0].def);
+					for(var i = 0; i < views[0].d.length; i++) {
+						var regId = new RegExp("\{" + i.toString() + ":id\}", "ig");
+						var regName = new RegExp("\{" + i.toString() + ":name\}", "ig");
+						addStr = addStr.replace(regId, views[0].d[i].id).replace(regName, views[0].d[i].name);
+					}
+					newv.data = JSON.parse(addStr);
+				}
+				document.activeElement.blur();
+				TLM.OpenWindow([newv]);
+			}
+
+		);
+		document.addEventListener('DataSelected', function(event) {
+				mui.fire(plus.webview.currentWebview().opener(), plus.webview.currentWebview().views[0].r, event.detail);
+				mui.back();
+			}
+
+		);
+		document.addEventListener('titleChange', function(event) {
+				$('#viewTitle').html(event.detail).removeClass('hidden');
+			}
+
+		);
+		document.addEventListener('removeViewChooseTab', function(event) {
+				removeViewChooseTab(event.detail);
+			}
+
+		);
+		//子页面数据加载完成后触发 mui.fire(plus.webview.currentWebview().opener(), 'SubDataInited', {});	
+		window.addEventListener('SubDataInited', function(event) {
+				//获得参数		
+				var viewnames = event.detail.v;
+				var listA = "";
+				var bodyWidth = plus.display.resolutionWidth;
+				liWidth = bodyWidth / viewnames.length;
+				var vlis = document.getElementsByClassName("vli");
+				if(viewnames.length <= 1) {
+					removeViewChooseTab(false,true);
+				} else {
+					for(var x = 0; x < viewnames.length; x++) {
+						listA += '<li class="vli"><a style="padding-bottom:7px;display:block;"  class="mui-control-item' + (views[0].v.toLowerCase() == viewnames[x].Value.toLowerCase() ? " mui-active" : "") + '" href="' + viewnames[x].Value.toLowerCase() + '">' + viewnames[x].Text + '</a></li>';
+					}
+					mui("#viewContainer")[0].innerHTML = listA;
+					//均分视图	
+					for(var i = 0; i < vlis.length; i++) {
+						vlis[i].style.width = liWidth + "px";
+					}
+				}
+				//按钮(button)，新建按钮(create)，(p:Privilege)
+				if(!(views[0].b && views[0].b.c == 0) && event.detail.p.CREATE > 0) {
+					mui("#btn_create")[0].style.display = "inline-block";
+				} else {
+					$('#btn_search').css('right', '10px');
+				}
+				if(!(views[0].b && views[0].b.s == 0)) {
+					searchEnable = true;
+					if($('#search').val().length <= 0) mui("#btn_search")[0].style.display = "inline-block";
+				}
+			}
+
+		);
+
+		function removeViewChooseTab(DoNotChangeStyle,firstTimeFlag) {
+			document.getElementById('ULList').setAttribute('class', 'hidden');
+			if(!DoNotChangeStyle) {
+				try{
+					if(!!firstTimeFlag) if(!!views[0].s.top) return;
+				}catch(e){}
+				
+				plus.webview.getWebviewById(views[0].id + "_sub").setStyle({
+					top: "45px"
+				});
+				var nodestyle = document.createElement('style');
+				nodestyle.innerHTML = '.mui-bar-nav~.mui-content .mui-pull-top-pocket {top: 44px!important;}';
+				document.head.appendChild(nodestyle);
+			}
+		}
+
+		var floatw = null;
+
+		function floatWebview() {
+			if(floatw) {
+				// 避免快速多次点击创建多个窗口
+				floatw.show("fade-in");
+			} else {
+				floatw = plus.webview.create("menu.html", "menu", {
+					background: 'transparent',
+					zindex: 10,
+				});
+				floatw.show("fade-in");
+			}
+		}
+
+		function ShowSearchLine() {
+			$('.mui-title').fadeOut(100, function() {
+				$('#search_area').slideDown(200);
+			});
+			$('#btn_search').slideUp(200);
+		}
+
+		function HideSearchLine() {
+			if(searchEnable) {
+				$('#search_area').slideUp(200, function() {
+					$('.mui-title').fadeIn(100);
+				});
+				$('#btn_search').slideDown(200);
+			}
+		}
+
+		function HideWhenSearchLineNotEmpty() {
+			if($('#search').val().length <= 0) HideSearchLine();
+		}
+
+		//新建记录成功后刷新列表
+		window.addEventListener('PullDownAfterCreate', function(event) {
+				mui.fire(plus.webview.getWebviewById(views[0].id + "_sub"), 'PullDownAfterCreate');
+			}
+
+		);
+		window.addEventListener('View_Before_Finished', function() {
+				if($('#viewTitle:hidden').length > 0) {
+					$('#viewTitle').html(views[0].t).removeClass('hidden');
+				}
+			}
+
+		);
+		window.addEventListener('View_Bind_Finished', function(event) {
+				FirstTimeLoad = false;
+			}
+
+		);
+		window.addEventListener('RemoveAllButtons', function(event) {
+				$('.view-btn-array').remove();
+			}
+
+		);
+		window.addEventListener('RemoveCreateButtons', function(event) {
+				$('#btn_create').remove();
+			}
+
+		);
+		window.addEventListener('RemoveSearchButtons', function(event) {
+				$('#btn_search').remove();
+			}
+
+		);
+		document.addEventListener('SubViewTouchStart', function() {
+				HideWhenSearchLineNotEmpty();
+			}
+
+		) //编辑记录成功后刷新修改的记录
+		window.addEventListener('RefreshAfterUpdate', function(event) {
+				mui.fire(plus.webview.currentWebview().opener(), 'RefreshAfterUpdate', event.detail);
+			}
+
+		);
+		window.addEventListener('EvalOnFirstLoad', function(event) {
+				if(FirstTimeLoad) {
+					eval(event.detail.script);
+				}
+			}
+
+		);
+		var EventPassThroughRegistry={};
+		window.addEventListener('ConfigEventPassThrough', function(event) {
+			if(!!event.detail.bindState){
+				if(!EventPassThroughRegistry[event.detail.eventType]){
+					window.addEventListener(event.detail.eventType,PassCustomEvent);
+					EventPassThroughRegistry[event.detail.eventType]=true;
+				}
+			}else{
+				EventPassThroughRegistry[event.detail.eventType]=false;
+				window.removeEventListener(event.detail.eventType,PassCustomEvent);
+			}
+		}
+
+		);
+		
+		function PassCustomEvent(event){
+			if(!!EventPassThroughRegistry){
+				mui.fire(plus.webview.currentWebview(),event.type,event.detail)
+			}
+		}
+	</script>
+
+</html>
