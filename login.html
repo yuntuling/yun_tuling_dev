@@ -1,0 +1,434 @@
+﻿<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>登录</title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+
+		<style>
+			.area {
+				margin: 20px auto 0px auto;
+			}
+			
+			.mui-input-group {
+				margin-top: 10px;
+			}
+			
+			.mui-input-group:first-child {
+				margin-top: 20px;
+			}
+			
+			.mui-input-group label {
+				width: 22%;
+			}
+			
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 78%;
+			}
+			
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 6px;
+			}
+			
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			
+			.mui-btn {
+				padding: 10px;
+			}
+			
+			.link-area {
+				display: block;
+				margin-top: 25px;
+				text-align: center;
+			}
+			
+			.spliter {
+				color: #bbb;
+				padding: 0px 8px;
+			}
+			
+			.oauth-area {
+				position: absolute;
+				bottom: 20px;
+				left: 0px;
+				text-align: center;
+				width: 100%;
+				padding: 0px;
+				margin: 0px;
+			}
+			
+			.oauth-area .oauth-btn {
+				display: inline-block;
+				width: 50px;
+				height: 50px;
+				background-size: 30px 30px;
+				background-position: center center;
+				background-repeat: no-repeat;
+				margin: 0px 20px;
+				/*-webkit-filter: grayscale(100%); */
+				border: solid 1px #ddd;
+				border-radius: 25px;
+			}
+			
+			.oauth-area .oauth-btn:active {
+				border: solid 1px #aaa;
+			}
+			
+			body,
+			div {
+				background: #fff;
+			}
+			
+			.mui-content {
+				background: #fff;
+			}
+			
+			.mui-input-group:after {
+				background: #fff;
+			}
+			
+			.mui-input-group:before {
+				background: #fff;
+			}
+			
+			.mui-table-view:before {
+				background: #fff;
+			}
+			
+			.mui-table-view:after {
+				background: #fff;
+			}
+			
+			.mui-input-group .mui-input-row:after {
+				bottom: 1px;
+			}
+			
+			.mui-checkbox input[type=checkbox]:before {
+				font-size: 22px;
+			}
+			
+			.mui-checkbox input[type=checkbox] {
+				top: 9px;
+				width: 22px;
+				height: 22px;
+			}
+			
+			.mui-checkbox.mui-left label {
+				padding-left: 45px;
+				font-size: 16px;
+			}
+			
+			.a_blue {
+				color: #1b82d2;
+			}
+		</style>
+		<script src="js/WGTUpgrade.js" type="application/javascript"></script>
+	</head>
+
+	<body onresize="document.activeElement.scrollIntoView(true);">
+
+		<div class="mui-content">
+			<div style="text-align: center; margin:80px 0px 20px 0px">
+				<img id="head-img" src="img/logo.png" style="width: 70px;height: 70px;max-height: 100%;max-width: 100%;border-radius:12px;" />
+			</div>
+			<form class="mui-input-group">
+				<ul class="mui-table-view mui-table-view-chevron">
+					<li class="mui-input-row">
+						<label style="color:#656565;">账号</label>
+						<input autocomplete="off" id='empno' type="text" class="mui-input-clear mui-input" placeholder="请输入手机号">
+					</li>
+					<li class="mui-input-row">
+						<label style="color:#656565;">密码</label>
+						<input autocomplete="off" id='pwd' type="password" class="mui-input-password mui-input" placeholder="请输入密码">
+					</li>
+				</ul>
+			</form>
+			<div class="mui-input-row mui-checkbox mui-left">
+				<label class="a_blue">自动登录</label>
+				<input type="checkbox" id="savePassword" checked="checked">
+				<input type="checkbox" id="saveUserName" checked="checked">
+			</div>
+
+			<div class="mui-content-padded" style="margin-top:0px;">
+				<button id='btnLogin' class="mui-btn mui-btn-block mui-btn-primary" style="background:#1b82d2;border:0px">登录</button>
+				<!--<button id='btnregister' class="mui-btn mui-btn-block mui-btn-primary" style="background:#FFFFFF;border:1px solid #CE3D3A;color:#CE3D3A;" onclick="NewOpenWindow('register.html')">注册</button>-->
+			</div>
+
+			<nav id="MemuContainer" class="mui-bar mui-bar-tab" style="background-color: transparent;box-shadow:0 0 0;-webkit-box-shadow:0;">
+
+				<div class="mui-content-padded" style="display: none;">
+					<a href="javascript:mui.alert('请将您的问题邮件至:tulingbuy@tuling.com.cn')" class="a_blue">遇到问题？</a>
+					<a href="javascript:TLM.OpenWindow([{url: 'register.html',id:'register.html'}]);" style="float:right;" class="a_blue">注册</a>
+				</div>
+				<div id="foot" class="mui-content-padded oauth-area" style="z-index: -1;height: 50px; width: 100%;background-color: transparent;">
+
+				</div>
+			</nav>
+
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/config.js"></script>
+		<script>
+			mui.init({});
+			var EmpNo, Pwd;
+			var clickedCount = 0;
+			var firstTiemBridgeReady = true;
+			//该方法在ajax桥梁页加载完成后回调
+			window.addEventListener('DoOnBridgeReady', function(event) {
+				//首次桥加载完成
+				if(firstTiemBridgeReady) {
+					firstTiemBridgeReady = false;
+					//登录按钮事件
+					document.getElementById('btnLogin').addEventListener('tap', function(event) {
+						EmpNo = document.getElementById("empno").value;
+						Pwd = document.getElementById("pwd").value;
+						Login();
+					});
+					//处理记住密码和记住用户名的关系
+					document.getElementById('savePassword').addEventListener('change', function(e) {
+						if(e.target.checked) {
+							document.getElementById('saveUserName').checked = true;
+						}
+					});
+					document.getElementById('saveUserName').addEventListener('change', function(e) {
+						if(!e.target.checked) {
+							document.getElementById('savePassword').checked = false;
+						}
+					});
+
+					mui('#head-img')[0].addEventListener('tap', function(event) {
+						if(clickedCount < 2) {
+							clickedCount++;
+							setTimeout(function() {
+								clickedCount = 0;
+							}, 2000);
+						} else {
+							clickedCount = 0;
+							if(!!DebugMenuClicked && typeof(DebugMenuClicked) == 'function') {
+								DebugMenuClicked()
+							}
+						}
+					})
+
+					//自动登录判断
+					if(!!window.localStorage.LoginPreference) {
+						try {
+							var savedUser = JSON.parse(window.localStorage.LoginPreference);
+							if(savedUser.saveUsername) {
+								document.getElementById('empno').value = utils.utf16ToEntities(savedUser.userName);
+							}
+							if(savedUser.autoLogin) {
+								EmpNo = utils.utf16ToEntities(savedUser.userName);
+								Pwd = utils.utf16ToEntities(savedUser.password);
+								Login();
+							} else {
+								plus.navigator.closeSplashscreen();
+							}
+						} catch(e) {
+							plus.navigator.closeSplashscreen();
+						}
+					} else {
+						plus.navigator.closeSplashscreen();
+					}
+
+				}
+
+			});
+
+			function IMLogin()
+			{
+				
+				if(!!JSON.parse(window.localStorage.user).systemuserid){	
+					plus.webview.getWebviewById("ajaxBridge").evalJS("startUpSignalr();");
+
+				}else{
+					mui.toast('登陆不成功，当前版本不适用于您的账号');
+				}
+			}
+			
+			//登录
+			function Login() {
+				if(mui.os.android) {
+					if(NeedUpdate('1.9.9.31454',plus.runtime.innerVersion)){
+						alert('您的APP基座过旧，我们将开始更新APP');
+						plus.runtime.openURL( 'http://crm.tulingbuy.com/AppDownload.aspx' )
+						return;
+					}
+				}
+				if(mui.os.ios){
+					if(NeedUpdate('1.9.0.30956',plus.runtime.innerVersion)){
+						alert('您的APP基座过旧，我们将开始更新APP');
+						plus.runtime.openURL( 'http://crm.tulingbuy.com/AppDownload.aspx' )
+						return;
+					}
+				}
+				if(!EmpNo || !Pwd) {
+					mui.alert("请输入工号和密码");
+					return;
+				}
+				if(EmpNo == "" || Pwd == "") {
+					mui.alert("请输入工号和密码");
+					return;
+				}
+				plus.nativeUI.showWaiting('正在尝试登录', {
+					"back": "none"
+				});
+				TLM.ajax({
+					url: TLM.ServiceUrl + "/login.aspx?applogin=1&r=" + Date.now().toString(),
+					type: "POST",
+					data: {
+						"mobile": EmpNo,
+						"pwd": Pwd
+					},
+					async: true,
+					dataType: "json",
+					success: function(dat) {
+						if(dat.ResultCode == 0) {
+							var saveUserName = document.getElementById('saveUserName').checked;
+							var savePassword = document.getElementById('savePassword').checked;
+							if(savePassword) {
+								saveUserName = true;
+							}
+							if(!saveUserName) {
+								savePassword = false;
+							}
+							var savedUser = {};
+							savedUser.autoLogin = savePassword;
+							savedUser.saveUsername = saveUserName;
+							if(saveUserName) {
+								savedUser.userName = utils.entitiesToUtf16(EmpNo);
+							}
+							if(savePassword) {
+								savedUser.password = utils.entitiesToUtf16(Pwd);
+							}
+							window.localStorage.LoginPreference = JSON.stringify(savedUser);
+
+							window.localStorage.user = JSON.stringify(dat.ResultData);
+							window.localStorage.empno = dat.ResultData.username;
+							
+							if(!!CheckUpdate && typeof(CheckUpdate) == 'function') {
+								if(window.localStorage.RCVersion == 1) {
+									CheckUpdate(dat.ResultData.rc_wgt_version, dat.ResultData.rc_wgt_address);
+								} else {
+									CheckUpdate(dat.ResultData.wgt_version, dat.ResultData.wgt_address);
+								}
+							} else {
+								IMLogin();								
+							}
+
+						} else {
+							mui.alert(dat.ResultMessage);
+							plus.nativeUI.closeWaiting();
+						}
+					},
+					error: function() {
+						mui.alert("发生错误，登录失败！");
+						plus.nativeUI.closeWaiting();
+					}
+				});
+			}
+
+			mui.plusReady(function() {
+								plus.navigator.setStatusBarBackground('#1b82d2');
+				plus.navigator.setStatusBarStyle('light');
+				openAjaxBridge(false, true);
+				//仅支持竖屏显示
+				try {
+					plus.screen.lockOrientation("portrait-primary");
+				} catch(e) {
+
+				}
+
+				//处理返回按钮操作
+				mui.back = function(event) {
+					if(!mui.os.ios) {
+						mui.confirm('您是否要退出', '退出确认', ['否', '是'], function(e) {
+							if(e.index == 1) {
+								plus.runtime.quit();
+							}
+						}, 'div');
+					}
+					return false;
+				};
+
+				//头像显示
+				document.getElementById("empno").addEventListener("blur", function() {
+					if(!!window.localStorage.user &&
+						window.localStorage.user != '') {
+						var user_info = JSON.parse(window.localStorage.user);
+
+						if(user_info.tlm_empno == document.getElementById("empno").value && user_info.userimg != "") {
+							document.getElementById("head-img").src = TLM.ServiceUrl + user_info.userimg;
+						} else {
+							document.getElementById("head-img").src = "img/logo.png";
+						}
+					} else {
+						document.getElementById("head-img").src = "img/logo.png";
+					}
+				});
+
+			});
+
+			function openAjaxBridge(LoadingFlag, firstTime) {
+				//打开ajax桥梁页面
+				if(!!LoadingFlag) {
+					plus.nativeUI.showWaiting('正在注销...');
+				}
+				try {
+					plus.webview.getWebviewById('ajaxBridge').close();
+				} catch(e) {
+
+				}
+				try {
+					plus.webview.getWebviewById('ajaxBridge').close();
+				} catch(e) {
+
+				}
+				var ajaxWebview = plus.webview.create(TLM.ServiceUrl + "/ajaxBridge.html", 'ajaxBridge');
+				if(!!LoadingFlag) {
+					ajaxWebview.onloaded = function() {
+						plus.nativeUI.closeWaiting();
+					};
+				}
+				ajaxWebview.appendJsFile("_www/js/jquery-1.9.1.min.js");
+				ajaxWebview.appendJsFile("_www/js/jquery.signalR-2.2.2.min.js");
+				ajaxWebview.appendJsFile("_www/js/ajax-bridge.js");
+				ajaxWebview.appendJsFile("_www/js/chat-bridge.js");
+			}
+			document.addEventListener('BackToLoginPage', function(event) {
+				var whiteList = {};
+				try {
+					whiteList = event.detail.whiteList;
+					if(!whiteList) {
+						whiteList = {};
+					}
+					whiteList[plus.webview.currentWebview().id] = true;
+				} catch(e) {
+					whiteList = {};
+					whiteList[plus.webview.currentWebview().id] = true;
+				}
+				var webviews = plus.webview.all();
+				for(var webviewIndex in webviews) {
+					if(webviews.hasOwnProperty(webviewIndex)) {
+						try {
+							if(!whiteList[webviews[webviewIndex].id]) {
+								webviews[webviewIndex].close();
+							}
+						} catch(e) {}
+					}
+				}
+				if(!whiteList["ajaxBridge"]) {
+					openAjaxBridge(true);
+				}
+			})
+		</script>
+	</body>
+
+</html>

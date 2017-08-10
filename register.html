@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/mui.min.js"></script>
+		<script src="js/config.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/mui.extension.css" rel="stylesheet" />
+		<link href="css/iconfont.css" rel="stylesheet" />
+		<style>
+			body, .mui-content{
+				background:#FFFFFF;
+			}
+			.mui-input-group{
+				margin:20px 0px;
+			}
+			.mui-input-group .mui-input-row, .mui-input-group .mui-table-view-cell{
+				height:50px;
+			}
+			.mui-input-row label,.mui-table-view-cell label{
+				padding-top:0;
+				line-height: 50px;
+				height: 50px;
+			}
+			.mui-input-group input,.mui-table-view-cell input{
+				height: 50px;
+			}
+			#send{
+				width:30%;
+			}
+			.mui-btn-block{
+				padding:10px 0px;
+			}
+			.mui-table-view-cell input[type=text]{
+				padding-left:0px;
+			}
+			.mui-table-view:before, .mui-table-view-chevron:before{
+				height:0;
+			}
+			.mui-table-view:after, .mui-table-view-chevron:after,.mui-input-group:after{
+				height:0;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav mui-headerExt" style="background-color: #1b82d2">
+			<a id="icon-location" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color:white;"></a>
+			<h1 id="title" class="mui-title">注册</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group">
+				<ul class="mui-table-view mui-table-view-chevron">
+					<li class="mui-input-row" style="line-height:50px;">
+						<label>手机号码</label><input id='mobilephone' type="text" class="mui-input-clear mui-input" placeholder="请输入您的手机号码"/>
+					</li>
+					<li class="mui-input-row" style="line-height:50px;">
+						<input id="verifycode_text" type="text" class="mui-input" style="width:170px;" placeholder="请填写图形验证码"/>
+						<img id="verifycode" src="" style="width:100px;position:absolute;top:10px;right:15px;"/>			
+					</li>
+					<li class="mui-table-view-cell" style="padding-top:0;">
+						<input id='confirmation' type="text" class="mui-input-clear mui-input" placeholder="请填写短信验证码"/>
+						<button id='send' type="button" class="mui-btn" >
+							获取验证码
+						</button>
+					</li>
+					<li class="mui-input-row" style="line-height:50px;">
+						<label>登录密码</label><input id='pwd' type="password" class="mui-input-password" placeholder="6-20位数字或字母"/>
+					</li>
+					<li class="mui-input-row" style="line-height:50px;">
+						<label>确认密码</label><input id='Repwd' type="password" class="mui-input-password" placeholder="请再次输入登录密码"/>
+					</li>	
+				</ul>
+			</form>
+			<div class="mui-content-padded">
+				<button id='btnregister' class="mui-btn mui-btn-block mui-btn-primary" style="background:#1b82d2;border:0px">注册</button>
+			</div>
+		</div>
+	</body>
+	<script>
+		function refreshVerifyCode(){
+			document.getElementById("verifycode").src= TLM.ServiceUrl + "/isv/verifycode/verifycodegenerator.ashx?date=" + new Date().getTime();
+		}
+		(function($,doc){
+			$.init({});
+			
+			refreshVerifyCode();
+		
+			document.getElementById("verifycode").onclick = function(){
+				refreshVerifyCode();
+			}
+			
+			//发送验证码
+			document.getElementById('send').onclick = function(){
+                var PhoneNumber = document.getElementById('mobilephone').value;
+				var VerifyCode = document.getElementById("verifycode_text").value;
+                var reg = new RegExp("^[1][358][0-9]{9}$");
+                if(PhoneNumber == "" && !reg.test(PhoneNumber))
+				{
+					mui.alert("请输入正确的手机号码");
+				}
+                else if(!!VerifyCode == false || VerifyCode.length != 4){
+					mui.alert("请输入正确的图形验证码");
+					refreshVerifyCode();
+                    interval = null;
+                    sleep = 60;
+                    Send.style.cursor = "pointer";
+                    Send.removeAttribute ('disabled');
+                    Send.innerText = "获取验证码";
+                    Send.style.backgroundColor = '';
+                }
+				else
+				{
+					TLM.ajax({
+                		url: TLM.ServiceUrl + "/ISV/RegisterOperation/GetVerificationCode.ashx",
+                		type: "POST",
+                		dataType: "json",
+                		async: true,
+                		data: {
+                			"PhoneNumber" : PhoneNumber,
+                			"VerifyCode" : VerifyCode
+                		},
+                		success: function(data){
+                			if(data.ResultCode == 0){
+                				mui.alert("验证码已发送！");
+	                			var sleep = 60, interval = null;
+								var Send = document.getElementById('send');
+				   				if (!interval)
+				                {
+				                    Send.style.backgroundColor = '#D5D4D8';
+				                    Send.disabled = "disabled";
+				                    Send.innerText = "重新获取 (" + sleep-- + ")";
+				                    interval = setInterval (function ()
+				                    {
+				                        if (sleep == 0)
+				                        {
+				                            if (!!interval)
+				                            {
+				                                clearInterval (interval);
+				                                interval = null;
+				                                sleep = 60;
+				                                Send.style.cursor = "pointer";
+				                                Send.removeAttribute ('disabled');
+				                                Send.innerText = "获取验证码";
+				                                Send.style.backgroundColor = '';
+				                            }
+				                            return false;
+				                        }
+				                        Send.innerText  = "重新发送 (" + sleep-- + ")";
+				                    }, 1000);
+				                }
+                			}
+                			else{
+                				refreshVerifyCode();
+                			}		
+                		},
+                		error: function(e){
+                			mui.toast('获取验证码发生错误');
+                		}
+                	})
+				}
+			}
+			
+			
+			
+			//注册按钮
+			document.getElementById('btnregister').onclick = function (){
+				var w = plus.nativeUI.showWaiting();
+				var Mobilephone = document.getElementById('mobilephone').value;
+				var Pwd = document.getElementById('pwd').value;
+				var RePwd = document.getElementById('Repwd').value;
+				var Confirmation = document.getElementById('confirmation').value;
+				var VerifyCode = document.getElementById("verifycode_text").value;
+				var reg = new RegExp("^[1][358][0-9]{9}$");
+				var regPwd = new RegExp("^[a-zA-Z0-9]{6,20}$");
+				var regConfirmation = new RegExp("^[0-9]{4}$");
+				
+				if(!!Mobilephone == false){
+					mui.alert("请输入您的手机号码");
+					w.close();
+					return;
+				}
+				if(!!Mobilephone && !reg.test(Mobilephone)){
+					mui.alert("请输入正确的手机号码");
+					w.close();
+					return;
+				}
+				if(!!VerifyCode == false || VerifyCode.length != 4){
+					mui.alert("请输入正确的验证码");
+					w.close();
+					return;
+				}
+				if(!!Confirmation == false || Confirmation.length != 4){
+					mui.alert("请输入正确的短信验证码");
+					w.close();
+					return;
+				}
+				if(!!Pwd == false){
+					mui.alert("请输入您的登录密码");
+					w.close();
+					return;
+				}
+				if(!!Pwd && !regPwd.test(Pwd)){
+					mui.alert("登录密码为6-20位数字或字母");
+					w.close();
+					return;
+				}
+				if(!!RePwd == false){
+					mui.alert("请再次输入密码");
+					w.close();
+					return;
+				}
+				if(!!RePwd && RePwd != Pwd){
+					mui.alert("两次密码输入不一致,请重试");
+					w.close();
+					return;
+				}
+				
+					TLM.ajax({
+						url: TLM.ServiceUrl + "/ISV/RegisterOperation/RegisterSystemUser.ashx",
+						type: "POST",
+						async: true,
+						dataType: "json",
+						data: {
+							"PhoneNumber" : Mobilephone,
+							"Password" : Pwd,
+							"ValidationCode" : Confirmation,
+						},
+						success: function(data){
+							plus.nativeUI.closeWaiting();
+							w.close();
+							if(data.ResultCode == 0){
+								mui.toast("注册成功");
+                				mui.back();
+                			}
+							else if(data.ResultCode == 100){
+								refreshVerifyCode();
+							}
+							else if(data.ResultCode == 101){
+								//错误次数达到5次时
+								mui.alert("短信验证码错误次数过多，请重新获取!");
+								refreshVerifyCode();
+							}
+                			else
+                			{
+                				refreshVerifyCode();
+                			}	
+                			
+						},
+						error: function(e){
+							plus.nativeUI.closeWaiting();
+							document.getElementById("verifycode").src= TLM.ServiceUrl + "/isv/verifycode/verifycodegenerator.ashx?date=" + new Date().getTime();
+							mui.toast("注册失败");
+							w.close();
+						}
+				})	
+				//}
+				
+			}
+			
+		}(mui,document));
+	</script>
+</html>

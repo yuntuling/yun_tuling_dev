@@ -1,19 +1,190 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title></title>
-    <script type="text/javascript">
-    	
-   		document.addEventListener('plusready', function(){
-   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。"
-   			
-   		});
-   		
-    </script>
-</head>
-<body>
-	lalala
-</body>
+
+	<head>
+		<meta charset="utf-8">
+		<title>首页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/iconfont.css">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/mui.extension.css">
+		<style>
+			.signin {
+				margin-left: 0px !important;
+				display: none;
+			}			
+			.mui-bar-nav
+			{
+				box-shadow:none;
+				-webkit-box-shadow: none;
+			}
+			
+			
+			.mui-table-view:after{height: 0;}
+			.mui-active{color:#108ee9 !important;}
+			.mui-table-view-cell.mui-active{background-color: #CCCCCC;}
+
+		</style> 
+	</head>
+
+	<body>
+		
+		
+		<nav id="MemuContainer" class="mui-bar mui-bar-tab" style="background:#fff;">
+		
+		</nav>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			
+			//mui初始化
+			mui.init({});
+
+			mui.plusReady(function()
+			{
+				plus.runtime.getProperty(plus.runtime.appid, function(inf) {
+			    	localStorage.appversion=inf.version;
+			    	PageInit();
+			  });				
+			});
+			
+
+			//返回按钮
+			mui.back = function(event) {
+				if(!mui.os.ios) {
+					if(confirm('确认退出？')) {
+						plus.runtime.quit();
+					}
+				}
+				return false;
+			};
+			
+			function PageInit()
+			{
+				var links= [
+				{
+			        "Name": "消息",
+			        "Url": [{
+								"url":"IM/im-index.html",
+				        		"t":"消息",
+				        		"id":"chatIndexWebview"
+			        		}],
+			        "Icon": "mui-icon iconfont icon-message-copy",
+			        "Icon_fill":"mui-icon iconfont icon-xiaoxifill"
+			    },
+			    {
+			        "Name": "应用",
+					"Url": [{
+								"s":{"top":-41,"html":""},
+								"url":"view/view.html",
+								"e":"sitemap",
+								"v":"TLM_AppDefaultView",
+								"t":"应用",
+								"id":"sitemap",
+								"b":{"b":0,"c":0,"s":0},
+								"pagesize":"999"
+							}],
+			        "Icon": "mui-icon iconfont icon-yingyong",
+			        "Icon_fill":"mui-icon iconfont icon-yingyongfill"
+			    },
+			    {
+			        "Name": "通讯录",
+			        "Url": [{
+				        		"s":{"top":60,"html":""},
+						        "url":"view/view.html",
+						        "e":"tlm_contact",
+						        "t":"通讯录",
+						        "id":"tlm_contact",
+						        "v":"TLM_appContactMy",
+						        "b":{"b":0,"c":0}
+					        }],
+			        "Icon": "mui-icon iconfont icon-phonebook-o",
+			        "Icon_fill":"mui-icon iconfont icon-tongxunlu_fill"
+			    },
+			    {
+			        "Name": "我",
+			        "Url": [{
+					        	"url":(localStorage.appversion=="0.0.0"?"view/form.html":"/form/systemuser_appform_exist.html"),
+					        	"e":"systemuser",
+					        	"t":"我",
+					        	"form":"appform_exist",
+					        	"b":{"b":0,"e":0},
+					        	"id":JSON.parse(window.localStorage.user).systemuserid
+				        	}],
+			        "Icon": "mui-icon iconfont icon-yonghu",
+			        "Icon_fill":"mui-icon iconfont icon-yonghufill"
+			    }];
+			    
+			    //生成底部导航菜单
+				for(var i = 0; i < links.length; i++) 
+				{
+					var item = links[i]; 
+					var a = document.createElement("a");
+					a.classList.add("mui-tab-item");
+					a.href = item.Url[0].id;
+					a.innerHTML = '<i class="' + item.Icon + '"></i>'
+								+'<span class="mui-tab-label">' + item.Name + '</span>';
+					document.getElementById("MemuContainer").appendChild(a);
+				}
+				
+				//预加载页面
+				for(var i = links.length-1; i > -1 ; i--) 
+				{
+					var views=links[i].Url; 
+					mui.preload(
+					{
+						url:views[0].url,
+						id:views[0].id,
+						styles:{top: '0px',bottom: '51px',render:'always', popGesture:"none"},
+						extras:{'views':views}
+					});					
+				}
+				
+				//默认显示第一个页面
+				var activeTabid = links[0].Url[0].id;
+				$('#MemuContainer a:first').addClass('mui-active');
+				$('#MemuContainer a:first').find("i").prop("class",links[0].Icon_fill);
+				
+				//选项卡点击事件
+				mui('.mui-bar-tab').on('tap', 'a', function(e) 
+				{
+					var targetTabid = this.getAttribute('href');
+					if(targetTabid == activeTabid) return;
+					
+					//显示目标页
+					plus.webview.show(targetTabid,'auto');
+					//隐藏当前;
+					plus.webview.hide(activeTabid);
+	
+					activeTabid = targetTabid;
+
+					//切换tab图标
+            		$('#MemuContainer i').each(function(iIndex,iElement)
+            		{
+            			if(targetTabid==$(iElement).parent("a").prop("href"))
+            				$(iElement).prop("class",links[iIndex].Icon_fill);
+            			else
+            				$(iElement).prop("class",links[iIndex].Icon);
+            		}); 
+				});				
+				
+				setTimeout(function()
+				{
+					plus.webview.currentWebview().show('pop-in');	
+					setTimeout(function()
+					{
+						plus.webview.show(activeTabid);
+						plus.nativeUI.closeWaiting();
+						plus.navigator.closeSplashscreen();
+					},100);
+				},1000);
+			}
+		</script>
+
+	</body>
+
 </html>
