@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>通讯录</title>
+		<script src="../js/mui.min.js"></script>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/mui.extension.css" rel="stylesheet">
+		<style>
+			.mui-bar~.mui-content .mui-fullscreen {
+				top: 44px;
+				height: auto;
+			}
+			
+			.mui-pull-top-tips {
+				position: absolute;
+				top: -20px;
+				left: 50%;
+				margin-left: -25px;
+				width: 40px;
+				height: 40px;
+				border-radius: 100%;
+				z-index: 1;
+			}
+			
+			.mui-bar~.mui-pull-top-tips {
+				top: 24px;
+			}
+			
+			.mui-pull-top-wrapper {
+				width: 42px;
+				height: 42px;
+				display: block;
+				text-align: center;
+				background-color: #efeff4;
+				border: 1px solid #ddd;
+				border-radius: 25px;
+				background-clip: padding-box;
+				box-shadow: 0 4px 10px #bbb;
+				overflow: hidden;
+			}
+			
+			.mui-pull-top-tips.mui-transitioning {
+				-webkit-transition-duration: 200ms;
+				transition-duration: 200ms;
+			}
+			
+			.mui-pull-top-tips .mui-pull-loading {
+				/*-webkit-backface-visibility: hidden;
+				-webkit-transition-duration: 400ms;
+				transition-duration: 400ms;*/
+				margin: 0;
+			}
+			
+			.mui-pull-top-wrapper .mui-icon,
+			.mui-pull-top-wrapper .mui-spinner {
+				margin-top: 7px;
+			}
+			
+			.mui-pull-top-wrapper .mui-icon.mui-reverse {
+				/*-webkit-transform: rotate(180deg) translateZ(0);*/
+			}
+			
+			.mui-pull-bottom-tips {
+				text-align: center;
+				background-color: #efeff4;
+				font-size: 15px;
+				line-height: 40px;
+				color: #777;
+			}
+			
+			.mui-pull-top-canvas {
+				overflow: hidden;
+				background-color: #fafafa;
+				border-radius: 40px;
+				box-shadow: 0 4px 10px #bbb;
+				width: 40px;
+				height: 40px;
+				margin: 0 auto;
+			}
+			
+			.mui-pull-top-canvas canvas {
+				width: 40px;
+			}
+			
+			.mui-slider-indicator.mui-segmented-control {
+				border-bottom: 1px solid #e5e5e5;
+			}
+			
+			.im-userlist-header-contaier {
+				height: 50px;
+				font-size: 0;
+				background-color: #fff;
+				/*border: 1px solid #e5e5e5;*/
+			}
+			
+			.im-userlist-selected {
+				height: 100%;
+				display: inline-block;
+				width: 0;
+				margin: 0;
+				vertical-align: top;
+			}
+			
+			.im-userlist-search {
+				height: 100%;
+				display: inline-block;
+				width: 100%;
+				margin: 0;
+				vertical-align: top;
+			}
+			
+			.im-userlist-selected .mui-scroll-wrapper {
+				height: 48px;
+				border: none;
+			}
+			
+			.im-userlist-search input {
+				margin-top: 6px;
+				padding-left: 5px;
+				border: none;
+				vertical-align: middle;
+				border-radius: 0;
+				text-align: center;
+			}
+			
+			.im-userlist-selected .mui-media-object {
+				height: 40px;
+				width: 40px;
+				margin: 5px 2px;
+			}
+			
+			.mui-checkbox {
+				height: 40px;
+			}
+			
+			.mui-checkbox.mui-left input[type=checkbox] {
+				top: 6px;
+				left: 5px;
+			}
+			
+			.mui-checkbox .mui-media-object {
+				width: 40px;
+				height: 40px;
+				position: absolute;
+				left: 40px;
+			}
+			
+			.mui-checkbox label {
+				margin-left: 35px;
+			}
+			
+			.mui-table-view-cell.mui-active {
+				background-color: transparent!important;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+			<a style="color:#fff;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 style="color:#fff;" class="mui-title">发起聊天</h1>
+			<button style="color:#fff;" type="button" id="btn_selected" class="mui-btn mui-btn-link mui-pull-right">确定</button>
+		</header>
+		<div class="mui-content">
+			<div id="slider" class="mui-slider mui-fullscreen">
+				<div id="sliderSegmentedControl" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<div class="im-userlist-header-contaier">
+						<div class="im-userlist-selected">
+							<div id="scrollh" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+								<div class="mui-scroll" id="selected-list">
+									<!--<img class="mui-media-object" src="../img/60x60.gif">
+									<img class="mui-media-object" src="../img/60x60.gif">
+									<img class="mui-media-object" src="../img/60x60.gif">
+									<img class="mui-media-object" src="../img/60x601.gif">-->
+								</div>
+								<script type="text/template" id="tpl_selecteditem">
+									<img class="mui-media-object" src="<%= userimg%>" data-imgsrc="<%= userimg%>" data-username="<%= username%>" data-name="<%= name%>">
+								</script>
+							</div>
+						</div>
+						<div class="im-userlist-search">
+							<input type="text" id="txt_search" class="" placeholder="搜索">
+						</div>
+					</div>
+				</div>
+				<div class="mui-slider-group" style="top:50px;">
+					<div id="item1mobile" class="mui-slider-item mui-control-content">
+						<div id="scrollv" class="mui-scroll-wrapper">
+							<div class="mui-scroll">
+								<ul class="mui-table-view" id="user-list">
+								</ul>
+								<script type="text/template" id="tpl_useritem">
+									<% for(var index in objList){%>
+									<li class="mui-table-view-cell">
+										<div class="mui-input-row mui-checkbox mui-left">
+											<img class="mui-media-object" src="<%= objList[index].userimg %>">
+											<label style="position: absolute; top:-10px"><%=objList[index].name %></label>
+											<label style="position: absolute; top:10px"><%=objList[index].businessunitid.name %></label>
+											<input name="checkbox" value="<%= objList[index].username %>" type="checkbox" data-username="<%= objList[index].username %>" data-userimg="<%= objList[index].userimg %>" data-name="<%= objList[index].name %>">
+										</div>
+									</li>
+									<% } %>
+								</script>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		</div>
+		<script src="../js/mui.pullToRefresh.js"></script>
+		<script src="../js/mui.pullToRefresh.material.js"></script>
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/arttmpl.js"></script>
+		<script src="../js/config.js"></script>
+		<script src="JS/IMCommon.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			var searchCount=0,t_handle=null;
+			var currentUser = JSON.parse(localStorage.getItem("user"));
+			//alert(localStorage.getItem("user"));
+			var pageMax = 0;
+			var pageIndex = 0;
+			var pageSize = 20;
+			mui.init();
+			(function(mui, $) {
+				//阻尼系数
+				var deceleration = mui.os.ios ? 0.003 : 0.0009;
+				mui('.mui-scroll-wrapper').scroll({
+					bounce: false,
+					indicators: true, //是否显示滚动条
+					deceleration: deceleration
+				});
+				mui.plusReady(function() {
+					//load data
+					getData(pageIndex, initLoadData);
+					var $selectlist = $("#selected-list");
+					//绑定查询事件
+					$("#txt_search").bind("input propertychange", searchBlur);
+					//选择添加到已选择列表
+					$(".mui-table-view").on('change', 'input[type=checkbox]', function() {
+						var $this = $(this);
+						if($this.is(":checked")) {
+							if($selectlist.find("img[data-username=" + $this.attr("data-username") + "]").length != 0)
+								return;
+							var data = {
+								username: $this.attr("data-username"),
+								name: $this.attr("data-name"),
+								userimg: $this.attr("data-userimg")
+							};
+							$selectlist.append(template("tpl_selecteditem", data));
+						} else {
+							$selectlist.find("img[data-username=" + $this.attr("data-username") + "]").remove();
+						}
+						scrollhToEnd();
+						autoSetCount();
+					});
+					//已选择的点击移除
+					$("#selected-list").on('tap', '.mui-media-object', function() {
+						$this = $(this);
+						$useritem = $(".mui-checkbox input[data-username=" + $this.attr('data-username') + "]");
+						if($useritem.is(":checked")) {
+							$useritem.attr("checked", false);
+						}
+						$this.remove();
+						scrollhToEnd();
+						autoSetCount();
+					});
+					//循环初始化所有下拉刷新，上拉加载。
+					//mui.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+					mui('.mui-slider-group .mui-scroll').pullToRefresh({
+						down: {
+							callback: function() {
+								var self = this;
+								pageIndex = 0;
+								getData(pageIndex, function(data) {
+									initLoadData(data);
+									self.endPullDownToRefresh();
+									//self.refresh(true);
+									mui('.mui-slider-group .mui-scroll').pullToRefresh().refresh(true);
+								});
+							}
+						},
+						up: {
+							callback: function() {
+								var self = this;
+								getData(pageIndex, function(data) {
+									appendLoadData(data);
+									self.endPullUpToRefresh();
+								}, self);
+							}
+						}
+					});
+					//});
+
+					//确定按钮时间
+					document.getElementById("btn_selected").addEventListener("tap", function() {
+						if($.getQueryString("group") != null) {
+							var $selected = $("#selected-list .mui-media-object");
+							if($selected.length < 1) {
+								mui.toast("请选择联系人");
+								return;
+							} else {
+								var currentUser = JSON.parse(localStorage.getItem("user"));
+								var imgroup = {
+									group: {
+										id: $.getQueryString("group"),
+										name: $.getQueryString("name")
+									},
+									members: []
+								};
+								var members = [];
+								var objList = JSON.parse(sessionStorage.getItem("userList"));
+								$selected.each(function() {
+									if($(this).attr("data-username") == currentUser.username)
+										return true; //continure
+									imgroup.members.push({
+										username: $(this).attr("data-username"),
+										fullname: $(this).attr("data-name")
+									});
+									members.push($(this).attr("data-name"));
+								});
+								imgroup.members.push({
+									username: currentUser.username,
+									fullname: currentUser.name
+								});
+								members.push(currentUser.name);
+								imgroup.groupname = members.join("、");
+								console.log(JSON.stringify(imgroup))
+								IM.Server("joinGroup", imgroup);
+							}
+
+							return
+						}
+
+						var $selected = $("#selected-list .mui-media-object");
+						if($selected.length < 1) {
+							mui.toast("请选择联系人");
+							return;
+						} else if($selected.length == 1) {
+							//var curview = plus.webview.currentWebview();
+							//mui.openWindow("im-chat.html?sendto=" + encodeURI($selected.attr("data-username")) + "&userimg=" + encodeURI($selected.attr("data-imgsrc")) + "&name=" + encodeURI($selected.attr("data-name")), "chatWebview");
+							//curview.close();
+							var viewInfo = {
+								url: "im-chat.html?sendto=" + encodeURI($selected.attr("data-username")) + "&userimg=" + encodeURI($selected.attr("data-imgsrc")) + "&name=" + encodeURI($selected.attr("data-name")),
+								viewid: "chatWebview"
+							}
+							plus.webview.getWebviewById("chatIndexWebview").evalJS('$("li[touser=' + $selected.attr("data-username") + ']").find(".icon-hongdian").hide();');
+							mui.fire(plus.webview.getWebviewById("chatIndexWebview"), "delegateChatViewOpen", viewInfo);
+						} else {
+							var currentUser = JSON.parse(localStorage.getItem("user"));
+							var imgroup = {
+								groupname: "未命名",
+								members: []
+							};
+							var members = [];
+							var objList = JSON.parse(sessionStorage.getItem("userList"));
+							$selected.each(function() {
+								if($(this).attr("data-username") == currentUser.username)
+									return true; //continure
+								imgroup.members.push({
+									username: $(this).attr("data-username"),
+									fullname: $(this).attr("data-name")
+								});
+								members.push($(this).attr("data-name"));
+							});
+							imgroup.members.push({
+								username: currentUser.username,
+								fullname: currentUser.name
+							});
+							members.push(currentUser.name);
+							imgroup.groupname = members.join("、");
+
+							IM.Server("createGroup", imgroup);
+							plus.nativeUI.showWaiting("准备开始群聊...");
+						}
+					});
+					window.addEventListener("createGroupDone", function(data) {
+						data = data.detail;
+						plus.nativeUI.closeWaiting();
+						if(data.success) {
+							//mui.openWindow("im-groupchat.html?sendto=" + encodeURI(data.group.id) + "&userimg=" + encodeURI(data.group.img) + "&name=" + encodeURI(data.group.name), "groupchatWebview");		
+							var viewInfo = {
+								url: "im-groupchat.html?sendto=" + encodeURI(data.group.id) + "&userimg=" + encodeURI(data.group.img) + "&name=" + encodeURI(data.group.name),
+								viewid: "groupchatWebview"
+							}
+							plus.webview.getWebviewById("chatIndexWebview").evalJS('$("li[touser=' + data.group.id + ']").find(".icon-hongdian").hide();');
+							mui.fire(plus.webview.getWebviewById("chatIndexWebview"), "delegateChatViewOpen", viewInfo);
+						} else {
+							mui.toast("创建组失败");
+						}
+					});
+					window.addEventListener("createGroupError", function(data) {
+						data = data.detail;
+						plus.nativeUI.closeWaiting();
+						mui.toast("创建组失败!");
+					});
+ 					
+				});
+			})(mui, $);
+			//自动计算水平滚动条到最后
+			function scrollhToEnd() {
+				autoSetWidth();
+				var scroll = mui("#scrollh").scroll({
+					bounce: false
+				});
+
+				var $scrollWarpper = $("#scrollh");
+				var $scroll = $("#selected-list");
+
+				if($scroll.width() > $scrollWarpper.width()) {
+					scroll.reLayout();
+					scroll.scrollTo($scrollWarpper.width() - $scroll.width(), 0, 100);
+				} else {
+					scroll.scrollTo(0, 0, 100);
+				}
+
+			}
+
+			function autoSetWidth() {
+				if($(".im-userlist-selected").width() >= $(".im-userlist-header-contaier").width() * 0.7) {
+					$(".im-userlist-selected").width($(".im-userlist-header-contaier").width() * 0.7);
+					$(".im-userlist-search").width($(".im-userlist-header-contaier").width() * 0.3);
+				}
+				if($(".im-userlist-selected").width() <= $(".im-userlist-header-contaier").width() * 0.7 || $("#selected-list").width() <= $(".im-userlist-header-contaier").width() * 0.7) {
+					$(".im-userlist-selected").width($("#selected-list").width());
+					$(".im-userlist-search").width($(".im-userlist-header-contaier").width() - $("#selected-list").width());
+				}
+			}
+			function getData(page, done, pullRefreshEl) {
+
+				if(pageIndex > pageMax) {
+					pullRefreshEl.endPullUpToRefresh(true);
+					return;
+				}
+				var filterData = {
+					"Conditions": [{
+						"AttributeName": "deletionstatecode",
+						"Operator": "equal",
+						"Values": [0]
+					}, {
+						"AttributeName": "systemuserid",
+						"Operator": "notequal",
+						"Values": [currentUser.systemuserid]
+					}],
+					"FilterOperator": "AND",
+					"Filters": []
+				};
+
+				if($("#txt_search").val() != "") {
+					filterData.Filters = [{
+						"Conditions": [{
+								"AttributeName": "TLM_spell",
+								"Operator": "like",
+								"Values": [$("#txt_search").val()]
+							},
+							{
+								"AttributeName": "name",
+								"Operator": "like",
+								"Values": ["*" + $("#txt_search").val()]
+							}
+
+						],
+						"FilterOperator": "OR",
+						"Filters": []
+					}]
+				}
+
+				filterData = JSON.stringify(filterData);
+				
+				TLM.ajax({
+					type: "post",
+					url: TLM.ServiceUrl + "/Service/IM/GetUserListData.ashx",
+					//url: TLM.ServiceUrl + "/Service/Data/GetListData.ashx",
+					dataType: "json",
+					data: {
+						entityname: "systemuser",
+						order: "name asc",
+						pagenum: page,
+						pagesize: pageSize,
+						filter: filterData,
+						ViewName: "DefaultView"
+					},
+					success: function(data, textStatus) {
+						x=null
+						done(data);
+					}
+				});
+
+			}
+
+			function initLoadData(data) {
+
+				pageIndex++;
+				pageMax = Math.ceil(data.Total * 1.0 / pageSize);
+				if(data.List.length > 0) {
+					data.List.map(function(item) {
+						item.username = item.username;
+						item.userimg = getAvatar(item.userimg);
+						return item;
+					});
+				}
+				$("#user-list").html(template('tpl_useritem', {
+					objList: data.List
+				}));
+				//alert(JSON.stringify(data));
+			}
+
+			function appendLoadData(data) {
+				pageIndex++;
+				pageMax = Math.ceil(data.Total * 1.0 / pageSize);
+				if(data.List.length > 0) {
+					data.List.map(function(item) {
+						item.username = item.tlm_empno;
+						item.userimg = getAvatar(item.userimg);
+						return item;
+					})
+				}
+				$("#user-list").append(template('tpl_useritem', {
+					objList: data.List
+				}));
+
+			}
+
+			function autoSetCount() {
+				var num = $("#selected-list .mui-media-object").length;
+				if(num == 0)
+					$("#btn_selected").text("确定");
+				else
+					$("#btn_selected").text("确定(" + num + ")");
+			}
+
+			function searchBlur() {
+				searchCount++;
+				t_handle=setTimeout("autoSearch("+searchCount+")",500)
+				
+			}
+			function autoSearch(cnt){
+				if(searchCount==cnt){
+					//console.log($("#txt_search").val())
+					pageIndex = 0;
+					getData(pageIndex, function(data) {
+						var scroll = mui("#scrollv").scroll({
+							bounce: false
+						});
+						scroll.reLayout();
+						scroll.scrollTo(0, 0, 100);
+						initLoadData(data);
+						mui('.mui-slider-group .mui-scroll').pullToRefresh().refresh(true);
+					});
+				}
+			}
+		</script>
+	</body>
+
+</html>

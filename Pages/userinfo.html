@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>图灵买Mobile通讯录</title>
+    <script src="../js/mui.min.js"></script>
+    <link href="../css/mui.min.css" rel="stylesheet"/>
+    <link href="../css/mui.extension.css" rel="stylesheet">
+    <link href="../css/mui.indexedlist.css" rel="stylesheet" />
+    <link href="../css/iconfont.css" rel="stylesheet"/>
+    <style>
+		.mui-table-view-chevron:after, .mui-table-view:after{height:0px;}
+		.mui-table-view-chevron:before, .mui-table-view:before{height:0px;}
+		.mui-table-view-cell>a:not(.mui-btn).mui-active{
+		  background-color:transparent;
+		}
+		.mui-table-view:before,.mui-table-view:after{
+		  height:0;
+		}
+		.img_table li a #TLM_name{
+			margin-top:5px;
+		  color:#3a3a3a;
+		  font-size:16px;
+		}
+		.img_table li a #businessunitid{
+		  margin-top:15px;
+		}
+		.link_btn{
+		  display:block;
+		  text-align:center;
+		  height:45px;
+		  line-height:45px;
+		  background:#1b82d2;
+		  margin:15px;
+		  border-radius:5px;
+		}
+		.link_btn:active{
+		  background:#2691E2;
+		}
+		.link_btn span{
+		  font-size:16px;
+		  color: #FFF;
+		}
+		#avatar>img{
+			display:inline-block;
+			border-radius:4px;
+			min-width:60px;
+		}
+		#avatar>div{
+			display:inline-block;
+			padding-left:15px;
+			margin-top:2px;
+		}
+		.mui-input-row label{
+			padding:12px 2px;
+			font-size:15px;
+		}
+   </style>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+		<a style="color:#fff;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 id="title" style="color:#fff;" class="mui-title">徐雪琳</h1>
+	</header>
+	<div class="mui-content">
+		<!--头像信息-->
+		<ul class="mui-table-view img_table" style="margin:0px 0px 10px 0px;">				
+			<li class="mui-table-view-cell" style="padding:10px 0px 10px 15px;">
+				<a id="avatar"> 
+					<img id="userimg" class="mui-pull-left" src="../img/defaultuser.png" width="60" height="60"/>
+					<div>
+						<p id="TLM_name">姓名</p>
+        				<p class="mui-ellipsis" id="businessunitid">部门</p>
+					</div>
+				</a>
+			</li>
+		</ul> 
+
+		<ul class="mui-table-view mui-table-view-chevron" style="margin-top:10px;">
+			<li class="mui-table-view-cell">
+				<a class="callphone">
+				<div class="mui-input-row">
+					<label>手机号码</label>
+					<input id="mobile" type="text" class="mui-input-clear mui-input" readonly="readonly" disabled="disabled">
+				</div>
+				</a>
+			</li>
+			<li class="mui-table-view-cell">
+				<a>
+				<div class="mui-input-row">
+					<label>工号</label>
+					<input id="empno" type="text" class="mui-input-clear mui-input" readonly="readonly" disabled="disabled">
+				</div>
+				</a>
+			</li>
+			<li class="mui-table-view-cell">
+				<a>
+				<div class="mui-input-row">
+					<label>QQ</label>
+					<input id="qq" type="text" class="mui-input-clear mui-input" readonly="readonly" disabled="disabled">
+				</div>
+				</a>
+			</li>
+			<li class="mui-table-view-cell">
+				<a>
+				<div class="mui-input-row">
+					<label>邮箱</label>
+					<input id="email" type="text" class="mui-input-clear mui-input" readonly="readonly" disabled="disabled">
+				</div>
+				</a>
+			</li>
+			<li class="mui-table-view-cell">
+				<a class="callofficetel">
+				<div class="mui-input-row">
+					<label>固定电话</label>
+					<input id="officetel" type="text" class="mui-input-clear mui-input" readonly="readonly" disabled="disabled">
+				</div>
+				</a>
+			</li>
+		</ul>
+		
+		<div class="btnlist">
+			<a class="link_btn follow">
+				<span>关注</span>
+			</a>
+			<a class="link_btn SendMsg">
+				<span>发消息</span>
+			</a>
+		</div>
+	</div>
+    <script src="../js/jquery-1.9.1.min.js"></script>
+	<script src="../js/arttmpl.js"></script>
+	<script src="../js/config.js"></script>
+	<script src="../js/mui.indexedlist.js"></script>
+	<script type="text/javascript" charset="utf-8">
+	var self;
+	var userinfo = JSON.parse(window.localStorage.user);
+	var followid;
+	var toUser;
+	mui.plusReady(function(ob) {
+		var userid = plus.webview.currentWebview().systemUserId;
+//		console.log(JSON.stringify(plus.webview.currentWebview()));
+		var empno = plus.webview.currentWebview().empno;
+		if(!!empno){
+			data = { 'type': 'get', 'empno': empno};
+		}else{
+			data = { 'type': 'getbyid', 'userid': userid};
+		}
+		TLM.ajax({
+			type: 'get',
+			url: TLM.ServiceUrl +'/service/im/userservice.ashx',
+			data: data,
+			async: true,
+			success: function(data){
+				toUser = data;
+				//获取是否已经关注
+				$("#userimg").attr("src",TLM.ServiceUrl+(toUser.userimg));
+				$("#TLM_name").html(toUser.name);
+				$("#title").html(toUser.name);
+				$("#businessunitid").html(toUser.businessUnitName);
+				$("#empno").val(toUser.empno);
+				$("#mobile").val(toUser.mobile);
+				$("#qq").val(toUser.qq);
+				$("#email").val(toUser.email);
+				$("#officetel").val(toUser.officeTel);
+				
+				if(!!toUser.mobile){
+			        var callphone='tel:'+toUser.mobile;
+			        $(".callphone").attr('href',callphone);
+			    }
+				if(!!toUser.officetel){
+			        var callofficetel='tel:'+toUser.officetel;
+			        $(".callofficetel").attr('href',callofficetel);
+			    }
+				var filter = {};
+					filter.Conditions = [
+							{"AttributeName":"tlm_follow_from","Operator":"Equal","Values":[{"Name":"","id":userinfo.systemuserid}]},
+							{"AttributeName":"tlm_follow_to","Operator":"Equal","Values":[{"Name":"","id":toUser.systemUserId}]}
+							];
+					filter.FilterOperator = "AND";
+					filter.Filters = [];
+				
+				TLM.ajax({
+					type: "post",
+					url: TLM.ServiceUrl + "/service/data/getlistdata.ashx",
+					data: {
+						"entityname":"tlm_follow_systemuser",
+						"filter":JSON.stringify(filter)
+					},
+					dataType: "json",
+					async: true,
+					success: function(data) {
+						if (data.List.length == 0) {
+							$('.follow span').html("关注");
+							followid = "";
+						}else{
+							$('.follow span').html("取消关注");
+							followid = data.List[0].tlm_follow_systemuserid;
+						}
+					},
+					error: function(e) {
+						mui.toast("加载数据失败！");
+					}
+				});	
+			
+			}
+		});
+
+		mui(".btnlist").on("tap", "a.follow", function(){
+			if(followid==""){
+				var entity = {};
+				entity["tlm_follow_from"] = {"id":userinfo.systemuserid,"entityname":"SystemUser","name":""};
+				entity["tlm_follow_to"] = {"id":toUser.systemUserId,"entityname":"SystemUser","name":""};
+			
+				TLM.ajax({
+					type: "post",
+					url: TLM.ServiceUrl + "/Service/Data/SaveData.ashx",
+					data: {
+						"id":"",
+						"entityname":"tlm_follow_systemuser",
+						"data":JSON.stringify(entity)
+					},
+					//dataType: "text",
+					dataType:"json",
+					async: true,
+					success: function(data) {
+						//mui.toast("保存成功！");
+						mui.toast("关注成功");
+						$('.follow span').html("取消关注");
+						followid = data.ResultData;
+					},
+					error: function(e) {
+						mui.toast("关注失败！");
+					}
+				});
+			}
+			else{
+				TLM.ajax({
+					type: "post",
+					url: TLM.ServiceUrl + "/Service/Data/SoftDeleteItem.ashx",
+					data: {
+						"id":followid,
+						"entityname":"tlm_follow_systemuser",
+						"action":"delete"
+					},
+					//dataType: "text",
+					dataType:"json",
+					async: true,
+					success: function(data) {
+						if (data.ResultCode == 0) {
+						mui.toast("取消关注");
+						$('.follow span').html("关注");
+						followid = "";
+						}else{
+							mui.toast(data.ResultMessage);
+						}
+						
+					},
+					error: function(e) {
+						mui.toast("取消关注失败！");
+					}
+				});
+			}
+		});
+	
+		//点击发消息按钮事件
+		mui(".btnlist").on("tap", "a.SendMsg", function() {
+//					console.log("../IM/im-chat.html?sendto=" + encodeURI(toUser.userName) + "&userimg=" + encodeURI(toUser.userimg) + "&name=" + encodeURI(toUser.name), "chatWebview");
+			mui.openWindow("../IM/im-chat.html?sendto=" + encodeURI(toUser.userName) + "&userimg=" + encodeURI(toUser.userimg) + "&name=" + encodeURI(toUser.name), "chatWebview");
+			plus.webview.getWebviewById("chatIndexWebview").evalJS('$("li[touser=' + toUser.userName + ']").find(".icon-hongdian").hide();');
+		});	
+	});
+	</script>
+</body>
+</html>

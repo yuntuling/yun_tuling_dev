@@ -1,0 +1,76 @@
+html,
+body {
+	height: 100%;
+}
+
+li span {
+	color: red;
+	font-size: x-small;
+}
+
+.mui-bar {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.mui-table-view-cell {
+	height: 65px;
+}
+
+.bggreen {
+	background: #28ab90;
+}
+
+.bgblue {
+	background: #108ee9;
+}
+
+.bgorange {
+	background: #f49500;
+}
+
+.mui-table-view-cell {
+	padding-top: 9px;
+}
+
+.mui-table-view:after {
+	height: 0px;
+}
+
+.mui-table-view:before {
+	height: 0px;
+}
+
+.mui-table-view-cell:after {
+	background-color: #e5e5e5;
+}
+
+
+/*点击加号后的弹出菜单*/
+
+#topPopover {
+	position: fixed;
+	top: 16px;
+	right: 6px;
+	width: 130px;
+}
+
+#topPopover .mui-popover-arrow {
+	left: auto;
+	right: 6px;
+}
+
+.mui-backdrop {
+	opacity: 0.3;
+}
+
+.mui-popover {
+	height: 48px;
+}
+
+#topPopover .mui-table-view-cell {
+	text-align: center;
+	height: 34px;
+}
+
+

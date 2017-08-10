@@ -101,6 +101,8 @@
 
 .icon-tixing:before { content: "\e696"; }
 
+.icon-labelfill:before { content: "\e673"; }
+
 .icon-baoxiao1:before { content: "\e680"; }
 
 .icon-kehuguanli:before { content: "\e67d"; }
@@ -145,6 +147,8 @@
 
 .icon-yuyin:before { content: "\e636"; }
 
+.icon-jianpan3:before { content: "\e640"; }
+
 .icon-tupian1:before { content: "\e64b"; }
 
 .icon-qunliao2:before { content: "\e628"; }
@@ -174,6 +178,8 @@
 .icon-qingjiashenqing:before { content: "\e609"; }
 
 .icon-tupian3:before { content: "\e629"; }
+
+.icon-font37:before { content: "\e6c2"; }
 
 .icon-huifu1:before { content: "\e72d"; }
 
@@ -209,10 +215,10 @@
 
 .icon-zengjia:before { content: "\e61b"; }
 
+.icon-jianpan1:before { content: "\e71b"; }
+
 .icon-cunzhezhuanzhang:before { content: "\e679"; }
 
 .icon-wu:before { content: "\e62e"; }
 
 .icon-paizhao5:before { content: "\e633"; }
-
-

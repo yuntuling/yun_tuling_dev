@@ -82,7 +82,7 @@
 								"s":{"top":-41,"html":""},
 								"url":"view/view.html",
 								"e":"sitemap",
-								"v":"TLM_AppDefaultView",
+								"v":"AppDefaultView",
 								"t":"应用",
 								"id":"sitemap",
 								"b":{"b":0,"c":0,"s":0},
@@ -96,10 +96,10 @@
 			        "Url": [{
 				        		"s":{"top":60,"html":""},
 						        "url":"view/view.html",
-						        "e":"tlm_contact",
+						        "e":"tly_contact",
 						        "t":"通讯录",
-						        "id":"tlm_contact",
-						        "v":"TLM_appContactMy",
+						        "id":"tly_contact_index", //这个ID在视图JS中有对应关系，不要修改
+						        "v":"tly_appViewMyContact",
 						        "b":{"b":0,"c":0}
 					        }],
 			        "Icon": "mui-icon iconfont icon-phonebook-o",
@@ -108,10 +108,10 @@
 			    {
 			        "Name": "我",
 			        "Url": [{
-					        	"url":(localStorage.appversion=="0.0.0"?"view/form.html":"/form/systemuser_appform_exist.html"),
+					        	"url":(localStorage.appversion=="0.0.0"?"form/form.html":"/form/systemuser_appform_exit.html"),
 					        	"e":"systemuser",
 					        	"t":"我",
-					        	"form":"appform_exist",
+					        	"form":"appform_exit",
 					        	"b":{"b":0,"e":0},
 					        	"id":JSON.parse(window.localStorage.user).systemuserid
 				        	}],

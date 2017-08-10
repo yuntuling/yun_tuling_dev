@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/iconfont.css?0" />
+		<link rel="stylesheet" type="text/css" href="../css/app.css" />
+		<link href="../css/mui.imageviewer.css" rel="stylesheet" />
+		<link href="CSS/im-chat.css" rel="stylesheet" />
+		<style type="text/css">
+			.msg-item-self .msg-content,
+			.msg-item-self .msg-content .msg-content-arrow {
+				background: #009BDB;
+				border-color: #009BDB;
+			}
+			
+			.mui-content {
+				background: #EBEBEB;
+			}
+			
+			footer {
+				border-top: 0px !important;
+				background: #EBEBEB;
+			}
+			
+			#msg-type {
+				font-size: 30px;
+				color: #727272;
+			}
+			
+			#msg-image {
+				font-size: 30px;
+				color: #727272;
+			}
+			
+			.mui-icon-paperplane {
+				font-size: 16px !important;
+				color: #fff !important;
+				border-radius: 5px;
+				border: 1px solid #1B82D2;
+				padding: 5px;
+				padding-top: 10px !important;
+				padding-bottom: 10px !important;
+				background: #1B82D2;
+				position: relative;
+				top: -6px;
+				left: -2px
+			}
+			.msg-item-sys .msg-user,.msg-item-item .addTime{
+				display: none;
+			}
+			
+			.msg-item-sys .msg-content {
+				display: block;								
+				text-align: center;
+				width: 100%;
+				max-width: 100%;
+				border: none;
+				background-color: transparent;
+				color:#a0a0a0;
+			
+			}
+			
+			.msg-item-sys .msg-content .msg-content-arrow {
+				display: none;
+			}
+			
+			/*hjy*/
+			.msg-container{
+				overflow: hidden;
+			}
+			.msg-name{
+				display:block;
+				font-size:13px;
+				padding:0 7px 3px 7px;
+				color:#666;
+			}
+			.msg-item .msg-content .msg-content-arrow{
+				top:3px;
+			}
+			.msg-item-self .msg-name{
+				text-align:right;
+			}
+			.mui-grid-view.mui-grid-9 .mui-table-view-cell{
+				padding:0;
+				border:none;
+			}
+			.mui-grid-view.mui-grid-9{
+				border-top:0px;
+				border-left:0px;
+			}
+			.mui-grid-view.mui-grid-9 a:active{
+				text-decoration:none;
+			}
+			.chat_title{
+				overflow:hidden;
+				position:relative;
+				padding:0 50px;
+				height:50px;
+				border-top:1px solid #ddd;
+			}
+			.chatitem_grid{
+				overflow:auto;
+				padding:10px 15px;
+				background:#F2F2F2;
+				border-top:1px solid #ddd;
+			}
+		</style>
+	</head>
+
+	<body contextmenu="return false;">
+		<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+			<a style="color:#fff;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="btn_GroupSet" style="color:#fff;" class="mui-icon mui-icon-person-filled mui-pull-right"></a>
+			<h1 id="title" style="color:#fff;" class="mui-title">chat (聊天窗口)</h1>
+		</header>
+		<pre id='h'></pre>
+		<script id="msgTemplete" type="text/template">
+			<div id="{{id}}" class="msg-item {{self}}" msg-type='{{type}}' msg-content=''>
+				<p style="text-align: center;padding: 20px;display: none;" class="addTime ">{{time}}</p>
+				<img class="msg-user" style="padding: 0px;border: 0px;" src='{{UserImg}}' />
+				<div class="msg-container"><!--//TODO-->
+					<span class="msg-name">{{name}}</span><!--//TODO-->
+					<div class="msg-content">
+						<div class="msg-content-inner">
+							{{content}}
+						</div>
+						<div class="msg-content-arrow"></div>
+					</div>
+					<span class="mui-spinner {{waittingClass}}" style="margin-top: 8px;"></span>
+					<span style="display: none;font-size: 28px;color: darkgoldenrod;margin-top: 6px;" class="unsend mui-icon mui-icon-refresh mui-pull-right"></span>
+				</div><!--//TODO-->
+			</div>
+		</script>
+		<script id="soundTemplete" type="text/template">
+			<div>
+				<span style="font-size: 18px;font-weight: bold;" msg-content="{{src}}" class="mui-icon mui-icon-mic" ></span>
+				<span class="play-state">语音消息</span>
+			</div>
+		</script>
+		<script id="imgTemplete" type="text/template">
+			<img style="height:150px;" class="msg-content-image" data-preview-src="" data-preview-group="1" data-lazyload="{{sourcesrc}}" src="../img/60x60.gif" style="max-width: 100px;" />
+		</script>
+		<!--<script id="msgTemplete" type="text/template">
+			<div id="{{id}}"  class="msg-item" style="padding: 10px;width: 100%;">
+				<p class="addTime {{self}}" style="color: rgb(0,0,255) ;margin-bottom: 0px;">{{name}} {{time}}
+					<span class="mui-spinner {{waittingClass}}" style="margin-top: 8px;"></span>
+					<span style="display: none;font-size: 28px;color: darkgoldenrod;margin-top: 6px;" class="unsend mui-icon mui-icon-refresh mui-pull-right"></span>
+				</p>
+				<div style="margin-left:10px;word-wrap:break-word">{{content}}</div>
+				
+			</div>
+		</script>-->
+		<div class="mui-content">
+			<div id='msg-list' style="width: 100%;">
+
+			</div>
+		</div>
+		<!--<footer>
+			<div class="footer-left">
+				<i id='msg-image' class="mui-icon iconfont icon-tupian1"></i>
+			</div>
+			<div class="footer-center">
+				<textarea id='msg-text' type="text" class='input-text'></textarea>
+				<button id='msg-sound' type="button" class='input-sound' style="display: none;color:#727272;">按住说话</button>
+			</div>
+			<label for="" class="footer-right">
+				<i id='msg-type' class="mui-icon iconfont icon-yuyin"></i>
+			</label>
+		</footer>-->
+		<footer style="height:auto;padding:0;">
+			<div class="chat_title">
+				<div for="" class="footer-right">
+					<i id='msg-image' class="mui-icon iconfont icon-zengjia"></i>
+				</div>
+				<div class="footer-center">
+					<textarea id='msg-text' type="text" class='input-text' style="margin:0;"></textarea>
+					<button id='msg-sound' type="button" class='input-sound' style="display: none;color:#727272;">按住说话</button>
+				</div>
+				<div for="" class="footer-left">
+					<i id='msg-type' class="mui-icon iconfont icon-yuyin"></i>
+				</div>
+			</div>
+			<div class="chatitem_grid" style="display:none;">
+				<ul class="mui-table-view mui-grid-view mui-grid-9">
+					<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+						<a id="grid_img" href="#">
+							<span class="mui-icon iconfont icon-tupian3" style="color:#00C89D!important;"></span>
+		                    <div class="mui-media-body">图片</div>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3">
+						<a id="photograph" href="#">
+							<span class="mui-icon iconfont icon-paizhao5" style="color:#FFA356!important;"></span>
+		                    <div class="mui-media-body">拍照</div>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</footer>
+		<div id='sound-alert' class="rprogress">
+			<div class="rschedule"></div>
+			<div class="r-sigh">!</div>
+			<div id="audio_tips" class="rsalert">手指上滑，取消发送</div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/mui.imageViewer.js"></script>
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<script src="../js/config.js"></script>
+		<script src="../js/arttmpl.js"></script>
+		<script src="JS/IMCommon.js"></script>
+		<script src="JS/im-groupchat.js"></script>
+		<script>
+			mui.plusReady(function(){
+				$('#msg-text').focus(function(){
+					$('.chatitem_grid').css('display','none');
+					$('#msg-list').css('padding-bottom','50px');
+				})
+				$('.mui-content').on('tap','#msg-list',function(){
+					$('.chatitem_grid').css('display','none');
+					$('#msg-list').css('padding-bottom','50px');
+				})
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>聊天信息</title>
+		<script src="../js/mui.min.js"></script>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/mui.extension.css" rel="stylesheet">
+		<style>
+			.memberContent {
+				padding: 5px;
+				text-align: center;
+				background-color: #FFFFFF;
+			}
+			
+			.members {
+				display: inline-block;
+				padding: 8px;
+			}
+			
+			.members img {
+				height: 50px;
+				width: 50px;
+			}
+			
+			.setContent {}
+			
+			.setContent div {
+				padding-left: 15px;
+				padding-right: 15px;
+				width: 100%;
+				height: 40px;
+				background-color: #FFFFFF;
+				line-height: 40px;
+				position: relative;
+			}
+			
+			.setContent div.notend:after {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 15px;
+				right: 15px;
+				height: 1px;
+				content: '';
+				-webkit-transform: scaleY(.5);
+				transform: scaleY(.5);
+				background-color: #c8c7cc;
+			}
+			
+			.setContent div .settitle {
+				font-family: "微软雅黑";
+				font-size: 16px;
+			}
+			
+			.setContent div .setsub {
+				font-family: "微软雅黑";
+				float: right;
+				color: #8f8f94;
+				display: inline-block;
+				white-space:nowrap; 
+				overflow:hidden; 
+				text-overflow:ellipsis;
+				width: 150px;
+			}
+			
+			.exitContent {
+				width: 100%;
+				padding-left: 15px;
+				padding-right: 15px;
+			}
+			
+			.exitContent button {
+				font-family: "微软雅黑";
+				height: 50px;
+				padding: 0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="nomalPanal">
+			<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+				<a style="color:#fff;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 style="color:#fff;" class="mui-title">聊天信息</h1>
+				<button style="color:#fff;" type="button" id="btn_selected" class="mui-btn mui-btn-link mui-pull-right">确定</button>
+			</header>
+			<div class="mui-content">
+				<div class="memberContent">
+				</div>
+				<script id="memberTemplete" type="text/template">
+					<div id="{{systemuserid}}" no="{{tlm_empno}}" class="members">
+						<img src="{{userimg}}" />
+						<div>{{name}}</div>
+					</div>
+				</script>
+				<br />
+				<div class=" setContent ">
+					<div id="btn_changeName" class="notend ">
+						<span class="settitle">群聊名称</span>
+						<span id="renameContent" class="setsub" style="text-align:right">未命名</span>
+					</div>
+					<div id="btn_clear" class="end">
+						<span class="settitle">清空聊天记录</span>
+					</div>
+				</div>
+				<br />
+				<div class="exitContent ">
+					<button id="btn_delexit" type="button " class="mui-btn mui-btn-red mui-btn-block ">删除并退出</button>
+				</div>
+			</div>
+		</div>
+		<div id="deletePanal" style="display: none;">
+			<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+				<a id="btn_deletePanalBack" style="color:#fff;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 style="color:#fff;" class="mui-title">聊天成员</h1>
+				<button style="color:#fff;" type="button" id="btn_delete" class="mui-btn mui-btn-link mui-pull-right">删除</button>
+			</header>
+			<div class="mui-content">
+
+				<ul id="deleteContent" class="mui-table-view">
+
+				</ul>
+				<script id="deleteTemplete" type="text/template">
+
+					<li id="{{systemuserid}}" no="{{tlm_empno}}" class="mui-table-view-cell mui-media mui-checkbox mui-right">
+
+						<img class="mui-media-object mui-pull-left" src="{{userimg}}">
+
+						<input style="margin-top: 5px;" name="checkbox" type="checkbox">
+						<div class="mui-media-body">
+							<span style="display: inline-block;">{{name}}</span>
+						</div>
+					</li>
+
+				</script>
+			</div>
+		</div>
+		<div id="renamePanal" style="display: none;">
+			<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
+				<a id="btn_renamePanalBack" style="color:#fff;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+				<h1 style="color:#fff;" class="mui-title">修改群名称</h1>
+				<button style="color:#fff;" type="button" id="btn_rename" class="mui-btn mui-btn-link mui-pull-right">确定</button>
+			</header>
+			<div class="mui-content">
+				<br />
+				<input type="text" style="border: 0px;border-radius: 0px;" id="renameInput" placeholder="" />
+			</div>
+		</div>
+		<script type="text/javascript " src="../js/mui.min.js "></script>
+		<script type="text/javascript " src="../js/jquery-1.9.1.min.js "></script>
+		<script type="text/javascript " src="../js/config.js "></script>
+		<script src="JS/IMCommon.js "></script>
+		<script src="JS/groupset.js "></script>
+	</body>
+
+</html>

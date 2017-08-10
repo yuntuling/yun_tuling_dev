@@ -29,20 +29,7 @@ TLM.successFuncs={};
 TLM.completeFuncs={};
 TLM.failFuncs={};
 //接口地址
-TLM.ServiceUrl_distribution = "http://192.168.20.8";
-//IM服务接口地址
-TLM.IMServiceUrl_distribution = "http://192.168.20.8";
-//
-////接口地址
-//TLM.ServiceUrl_distribution = "http://test-yun-xiaoling.chinacloudsites.cn";
-////IM服务接口地址
-//TLM.IMServiceUrl_distribution = "http://test-yun-xiaoling.chinacloudsites.cn";
-//
-
-
-
-
-
+TLM.ServiceUrl_distribution = "http://test-yun-tuling.chinacloudsites.cn";
 
 //费用系统地址
 TLM.FyxtUrl_distribution = "http://yun.tulingbuy.com:7020";
@@ -52,20 +39,17 @@ TLM.MallServiceUrl = "http://www.tulingbuy.com";
 TLM.MallImgUrl = "http://img.tulingbuy.com";
 
 TLM.ServiceUrl_test = "http://test-yun-tuling.chinacloudsites.cn";
-TLM.IMServiceUrl_test = "http://test-yun-tuling.chinacloudsites.cn";
 TLM.FyxtUrl_test="http://192.168.33.177:8082";
 
 
 if(window.localStorage.ServiceUrl != undefined)
 {
 	TLM.ServiceUrl=window.localStorage.ServiceUrl;
-	TLM.IMServiceUrl=window.localStorage.IMServiceUrl;
 	TLM.FyxtUrl=window.localStorage.FyxtUrl;
 }
 else
 {
 	TLM.ServiceUrl = TLM.ServiceUrl_distribution;
-	TLM.IMServiceUrl = TLM.IMServiceUrl_distribution;
 	TLM.FyxtUrl = TLM.FyxtUrl_distribution;
 }
 
