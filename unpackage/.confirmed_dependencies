@@ -1,1 +1,59 @@
-null
+{
+	"index.html": {
+		"resources": [
+			"img/logo.png",
+			"css/mui.extension.css",
+			"js/jquery-1.9.1.min.js",
+			"css/iconfont.css",
+			"fonts/iconfont.ttf"
+		],
+		"refer": [
+			"IM/im-index.html",
+			"view/view.html",
+			"form/form.html"
+		]
+	},
+	"login.html": {
+		"resources": [
+			"js/mui.min.js",
+			"js/WGTUpgrade.js",
+			"fonts/mui.ttf",
+			"css/mui.min.css",
+			"img/logo.png",
+			"js/config.js"
+		],
+		"refer": [
+			"index.html"
+		]
+	},
+	"IM/im-index.html": {
+		"resources": [
+			"IM/JS/IMCommon.js",
+			"IM/JS/index.js",
+			"IM/CSS/index.css"
+		]
+	},
+	"view/view.html": {
+		"resources": [
+			"view/view_sub.html"
+		],
+		"refer": [
+			"view/view_sub.html"
+		]
+	},
+	"form/form.html": {
+		"resources": [
+			"js/mui.picker.js",
+			"js/mui.zoom.js",
+			"js/AttachmentUploadImg.js",
+			"js/mui.poppicker.js",
+			"css/mui.dtpicker.css",
+			"js/mui.previewimage.js",
+			"js/template.js",
+			"css/mui.poppicker.css",
+			"js/MobilePcFormBirdge.js",
+			"css/mui.picker.css",
+			"js/mui.dtpicker.js"
+		]
+	}
+}

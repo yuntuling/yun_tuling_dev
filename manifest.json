@@ -1,4 +1,4 @@
-﻿{
+{
     "@platforms": ["android", "iPhone", "iPad"],
     "id": "H5C1BC513",/*应用的标识，创建应用时自动生成，勿手动修改*/
     "name": "yun_tuling_dev",/*应用名称，程序桌面图标名称*/
@@ -199,5 +199,94 @@
                 }
             }
         }
-    }
+    },
+	"dependencies": {
+		"pages": {
+			"index.html": {
+				"resources": [
+					"img/logo.png",
+					"css/mui.extension.css",
+					"js/jquery-1.9.1.min.js",
+					"css/iconfont.css",
+					"fonts/iconfont.ttf"
+				],
+				"refer": [
+					"IM/im-index.html",
+					"view/view.html",
+					"form/form.html"
+				],
+				"priority": 0
+			},
+			"login.html": {
+				"resources": [
+					"js/mui.min.js",
+					"js/WGTUpgrade.js",
+					"fonts/mui.ttf",
+					"css/mui.min.css",
+					"img/logo.png",
+					"js/config.js"
+				],
+				"refer": [
+					"index.html"
+				],
+				"priority": 0
+			},
+			"IM/im-index.html": {
+				"resources": [
+					"IM/JS/IMCommon.js",
+					"IM/JS/index.js",
+					"IM/CSS/index.css"
+				],
+				"refer": [],
+				"priority": 0
+			},
+			"view/view.html": {
+				"resources": [
+					"view/view_sub.html"
+				],
+				"refer": [],
+				"priority": 0
+			},
+			"form/form.html": {
+				"resources": [
+					"js/mui.picker.js",
+					"js/mui.zoom.js",
+					"js/AttachmentUploadImg.js",
+					"js/mui.poppicker.js",
+					"css/mui.dtpicker.css",
+					"js/mui.previewimage.js",
+					"js/template.js",
+					"css/mui.poppicker.css",
+					"js/MobilePcFormBirdge.js",
+					"css/mui.picker.css",
+					"js/mui.dtpicker.js"
+				],
+				"refer": [],
+				"priority": 0
+			}
+		},
+		"idle": {
+			"resources": [
+				"Pages/userinfo.html",
+				"IM/CSS/im-chat.css",
+				"IM/groupset.html",
+				"register.html",
+				"Pages/modifypassword.html",
+				"fonts/mui-icons-extra.ttf",
+				"js/common.js",
+				"IM/im-chat.html",
+				"js/chat-bridge.js",
+				"css/calendar.css",
+				"js/ajax-bridge.js",
+				"README.md",
+				"IM/JS/groupset.js",
+				"img/60x60.gif",
+				"IM/userlist.html",
+				"js/jquery.signalR-2.2.2.min.js",
+				"IM/JS/im-groupchat.js",
+				"IM/im-groupchat.html",
+				"IM/JS/im-chat.js"
+			]
+		}
+	}
 }

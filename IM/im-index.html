@@ -19,22 +19,7 @@
 		<header class="mui-bar mui-bar-nav" style="background:#1b82d2;height:45px;">
 			<h1 style="color:#fff;" class="mui-title">消息</h1>
 			<a id="search" style="color:#fff;" class="mui-icon iconfont icon-jia mui-pull-right" href="javascript:mui.openWindow('userlist.html','chatUserListWebview')"></a>
-			<!--<a id="search" style="color:#fff;" class="mui-icon mui-icon-person  mui-pull-right" href="javascript:mui.openWindow('userlist.html')"></a>-->
 		</header>
-
-		<!--右上角弹出菜单-->
-		<!--<div id="topPopover" class="mui-popover">
-			<div class="mui-popover-arrow"></div>
-			<div class="mui-scroll-wrapper">
-				<div class="mui-scroll">
-					<ul class="mui-table-view">
-						<li class="mui-table-view-cell">
-							<a id="groupChat" href="javascript:mui('#topPopover').popover('hide');mui.openWindow('userlist.html')"><span class="mui-icon mui-icon-chat mui-pull-left" style="color:#888888;font-size:16px;"></span> 发起聊天</a>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</div>-->
 		<div class="mui-content" >
 			<div id="no_internet" style="display:none;height: 40px;line-height:40px;padding-left:10px;background-color:lightgoldenrodyellow;margin-top:px;">
 				<p>
@@ -48,9 +33,6 @@
 					<div class="mui-slider-handle">
 						<a id="notice" noticeid="" href='javascript:localStorage.setItem("lastnotice", $("#notice").attr("noticeid"));$("#notice").find(".icon-hongdian").hide();TLM.OpenWindow([{"e":"tly_notice","url":"/view/view.html","t":"公告","id":"tly_notice","b":{"c":0}}]);'>
 							<div class="mui-pull-left" style="margin-top:2px;border-radius:3px;overflow:hidden;margin-right:10px;"><i class="mui-icon iconfont icon-gonggao bggreen" style="font-size:38px;padding:6px;color:#fff;"></i></div>
-							<!--<div id="shortTime" class="mui-pull-right" style="color:#808080;padding-top:5px;font-size:13px;">
-								2017-06-01
-							</div>-->
 							<div id="notice" class="mui-media-body" style="padding-top:3px;">
 								<div style="text-overflow: ellipsis;overflow: hidden;color:#3A3A3A; white-space:nowrap;">
 									<label id="noticename" style="color:#3A3A3A;font-size:16px;font-weight: 400;line-height:24px;">公告</label>
@@ -68,13 +50,9 @@
 					<div class="mui-slider-handle">
 						<a href='javascript:TLM.OpenWindow([{"url":"/message/calendar.html","id":"calendar.html"}])'>
 							<div class="mui-pull-left" style="margin-top:2px;border-radius:3px;overflow:hidden;margin-right:10px;"><i class="mui-icon iconfont icon-daiban bgorange" style="font-size:38px;padding:6px;color:#fff;"></i></div>
-							<!--<div id="shortTime" class="mui-pull-right" style="color:#808080;padding-top:5px;font-size:13px;">
-								2017-06-01
-							</div>-->
 							<div class="mui-media-body" style="padding-top:3px;">
 								<div style="text-overflow: ellipsis;overflow: hidden;color:#3A3A3A; white-space:nowrap;">
 									<label id="name" style="color:#3A3A3A;font-size:16px;font-weight: 400;line-height:24px;">待办事宜</label>
-									<!--<span class="mui-icon iconfont icon-hongdian" style="font-size:10px;position:absolute;top:0;left:45px;"></span>-->
 									<p class='mui-ellipsis' style="margin-top:3px;white-space:nowrap;height: 20px;">
 										点击查看待办事宜
 									</p>
@@ -83,46 +61,7 @@
 						</a>
 					</div>
 				</li>
-				<!--<li id="" class="mui-table-view-cell mui-media" style="padding-top:4px;" sessionType="">
-					<div class="mui-slider-handle">
-						<a href='javascript:TLM.OpenWindow([{"url":"/view/view.html","e":"tly_approval","id":"tly_approval"}])'>
-							<div class="mui-pull-left" style="margin-top:2px;border-radius:3px;overflow:hidden;margin-right:10px;"><i class="mui-icon iconfont icon-shenpi bgblue" style="font-size:38px;padding:6px;color:#fff;"></i></div>
-							<div id="shortTime" class="mui-pull-right" style="color:#808080;padding-top:5px;font-size:13px;">
-								2017-06-01
-							</div>
-							<div class="mui-media-body" style="padding-top:3px;">
-								<div style="text-overflow: ellipsis;overflow: hidden;color:#3A3A3A; white-space:nowrap;">
-									<label id="name" style="color:#3A3A3A;font-size:16px;font-weight: 400;line-height:24px;">审批</label>
-									<span class="mui-icon iconfont icon-hongdian" style="font-size:10px;position:absolute;top:0;left:45px;"></span>
-									<p class='mui-ellipsis' style="margin-top:3px;white-space:nowrap;height: 20px;">
-										习近平拜访网新图灵
-									</p>
-								</div>
-							</div>
-						</a>
-					</div>
-				</li>
-				<li id="" class="mui-table-view-cell mui-media" style="padding-top:4px;" sessionType="">
-					<div class="mui-slider-handle">
-						<a href='javascript:TLM.OpenWindow([{"url":"/view/view.html","e":"tly_sysmessage","id":"tly_sysmessage"}])'>
-							<div class="mui-pull-left" style="margin-top:2px;border-radius:3px;overflow:hidden;margin-right:10px;"><i class="mui-icon iconfont icon-user-bar-message bggreen" style="font-size:38px;padding:6px;color:#fff;"></i></div>
-							<div id="shortTime" class="mui-pull-right" style="color:#808080;padding-top:5px;font-size:13px;">
-								2017-06-01
-							</div>
-							<div class="mui-media-body" style="padding-top:3px;">
-								<div style="text-overflow: ellipsis;overflow: hidden;color:#3A3A3A; white-space:nowrap;">
-									<label id="name" style="color:#3A3A3A;font-size:16px;font-weight: 400;line-height:24px;">系统消息</label>
-									<span class="mui-icon iconfont icon-hongdian" style="font-size:10px;position:absolute;top:0;left:45px;"></span>
-									<p class='mui-ellipsis' style="margin-top:3px;white-space:nowrap;height: 20px;">
-										习近平拜访网新图灵
-									</p>
-								</div>
-							</div>
-						</a>
-					</div>
-				</li>-->
 			</ul>
-			<!--<a class='mui-btn' href='javascript:mui.openWindow("im-groupchat.html?sendto=040ebba5-f609-4e77-bf90-455c7485e920&userimg=img&name=%e6%9c%aa%e5%91%bd%e5%90%8d", "groupchatWebview");'>测试群聊</a>-->
 			<div style="height: 10px;"></div>
 			<ul id="messages_list" class="mui-table-view">
 				<script id="messageTemplete" type="text/template">
